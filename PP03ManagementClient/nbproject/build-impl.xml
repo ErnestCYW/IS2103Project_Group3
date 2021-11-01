@@ -19,7 +19,7 @@
         - cleanup
 
         -->
-<project xmlns:carproject="http://www.netbeans.org/ns/car-project/1" basedir=".." default="default" name="PP03Client-impl">
+<project xmlns:carproject="http://www.netbeans.org/ns/car-project/1" basedir=".." default="default" name="PP03ManagementClient-impl">
     <import file="ant-deploy.xml"/>
     <fail message="Please build using Ant 1.7.1 or higher.">
         <condition>
@@ -400,7 +400,7 @@ or ant -Dj2ee.platform.classpath=&lt;server_classpath&gt; (where no properties f
                     </fileset>
                 </union>
                 <taskdef classname="org.testng.TestNGAntTask" classpath="${run.test.classpath}" name="testng"/>
-                <testng classfilesetref="test.set" failureProperty="tests.failed" listeners="org.testng.reporters.VerboseReporter" methods="${testng.methods.arg}" mode="${testng.mode}" outputdir="${build.test.results.dir}" suitename="PP03Client" testname="TestNG tests" workingDir="${work.dir}">
+                <testng classfilesetref="test.set" failureProperty="tests.failed" listeners="org.testng.reporters.VerboseReporter" methods="${testng.methods.arg}" mode="${testng.mode}" outputdir="${build.test.results.dir}" suitename="PP03ManagementClient" testname="TestNG tests" workingDir="${work.dir}">
                     <xmlfileset dir="${build.test.classes.dir}" includes="@{testincludes}"/>
                     <propertyset>
                         <propertyref prefix="test-sys-prop."/>
@@ -544,7 +544,7 @@ or ant -Dj2ee.platform.classpath=&lt;server_classpath&gt; (where no properties f
                 <condition else="-testclass @{testClass}" property="test.class.or.method" value="-methods @{testClass}.@{testMethod}">
                     <isset property="test.method"/>
                 </condition>
-                <condition else="-suitename PP03Client -testname @{testClass} ${test.class.or.method}" property="testng.cmd.args" value="@{testClass}">
+                <condition else="-suitename PP03ManagementClient -testname @{testClass} ${test.class.or.method}" property="testng.cmd.args" value="@{testClass}">
                     <matches pattern=".*\.xml" string="@{testClass}"/>
                 </condition>
                 <delete dir="${build.test.results.dir}" quiet="true"/>
@@ -743,7 +743,7 @@ exists or setup the property manually. For example like this:
             -->
     <target name="-check-main-class">
         <fail>
-                    Main class must be set. Go to PP03Client project properties -&gt; Run and set the main class there.
+                    Main class must be set. Go to PP03ManagementClient project properties -&gt; Run and set the main class there.
                     <condition>
                 <not>
                     <or>
@@ -754,12 +754,8 @@ exists or setup the property manually. For example like this:
             </condition>
         </fail>
     </target>
-    <target depends="init" if="no.dist.ear.dir" name="-deps-module-jar" unless="no.deps">
-        <ant antfile="${project.PP03Library}/build.xml" inheritall="false" target="jar"/>
-    </target>
-    <target depends="init" if="dist.ear.dir" name="-deps-ear-jar" unless="no.deps">
-        <ant antfile="${project.PP03Library}/build.xml" inheritall="false" target="jar"/>
-    </target>
+    <target depends="init" if="no.dist.ear.dir" name="-deps-module-jar" unless="no.deps"/>
+    <target depends="init" if="dist.ear.dir" name="-deps-ear-jar" unless="no.deps"/>
     <target depends="init, -check-main-class, -deps-module-jar, -deps-ear-jar" name="deps-jar"/>
     <target depends="init,deps-jar" name="-pre-pre-compile">
         <mkdir dir="${classes.dir}"/>
@@ -769,20 +765,10 @@ exists or setup the property manually. For example like this:
         <!-- You can override this target in the ../build.xml file. -->
     </target>
     <target depends="compile" if="is.server.weblogic" name="library-inclusion-in-archive">
-        <basename file="${libs.jakartaee-api-8.0.classpath}" property="manifest.libs.jakartaee-api-8.0.classpath"/>
-        <basename file="${reference.PP03Library.jar}" property="manifest.reference.PP03Library.jar"/>
-        <manifest file="${build.ear.classes.dir}/META-INF/MANIFEST.MF" mode="update">
-            <attribute name="Extension-List" value="jar-1 jar-2 "/>
-            <attribute name="jar-1-Extension-Name" value="${manifest.libs.jakartaee-api-8.0.classpath}"/>
-            <attribute name="jar-2-Extension-Name" value="${manifest.reference.PP03Library.jar}"/>
-        </manifest>
+        <manifest file="${build.ear.classes.dir}/META-INF/MANIFEST.MF" mode="update"/>
     </target>
     <target depends="compile" if="dist.ear.dir" name="library-inclusion-in-manifest">
-        <copyfiles files="${libs.jakartaee-api-8.0.classpath}" manifestproperty="manifest.libs.jakartaee-api-8.0.classpath" todir="${dist.ear.dir}/lib"/>
-        <copyfiles files="${reference.PP03Library.jar}" manifestproperty="manifest.reference.PP03Library.jar" todir="${dist.ear.dir}/lib"/>
-        <manifest file="${build.ear.classes.dir}/META-INF/MANIFEST.MF" mode="update">
-            <attribute name="Class-Path" value="${manifest.libs.jakartaee-api-8.0.classpath} lib/${manifest.libs.jakartaee-api-8.0.classpath} ${manifest.reference.PP03Library.jar} lib/${manifest.reference.PP03Library.jar} "/>
-        </manifest>
+        <manifest file="${build.ear.classes.dir}/META-INF/MANIFEST.MF" mode="update"/>
     </target>
     <target name="-copy-meta-inf">
         <copy todir="${classes.dir}">
@@ -936,17 +922,17 @@ exists or setup the property manually. For example like this:
         </macrodef>
     </target>
     <target if="j2ee.appclient.mainclass.args" name="-as-retrieve-option-workaround" unless="j2ee.clientName">
-        <property name="client.jar" value="${dist.dir}/PP03ClientClient.jar"/>
+        <property name="client.jar" value="${dist.dir}/PP03ManagementClientClient.jar"/>
         <sleep seconds="3"/>
-        <copy failonerror="false" file="${wa.copy.client.jar.from}/PP03Client/PP03ClientClient.jar" todir="${dist.dir}"/>
+        <copy failonerror="false" file="${wa.copy.client.jar.from}/PP03ManagementClient/PP03ManagementClientClient.jar" todir="${dist.dir}"/>
         <copy failonerror="false" flatten="true" todir="${dist.dir}/">
-            <fileset dir="${wa.copy.client.jar.from}/PP03Client" includes="**/PP03ClientClient.jar"/>
+            <fileset dir="${wa.copy.client.jar.from}/PP03ManagementClient" includes="**/PP03ManagementClientClient.jar"/>
         </copy>
-        <copy flatten="true" todir="${dist.dir}/PP03ClientClient">
-            <fileset dir="${wa.copy.client.jar.from}/PP03Client" includes="**/*.*ar"/>
+        <copy flatten="true" todir="${dist.dir}/PP03ManagementClientClient">
+            <fileset dir="${wa.copy.client.jar.from}/PP03ManagementClient" includes="**/*.*ar"/>
         </copy>
-        <copy failonerror="false" flatten="false" todir="${dist.dir}/PP03ClientClient">
-            <fileset dir="${dist.dir}/gfdeploy/PP03Client" includes="**/*.jar"/>
+        <copy failonerror="false" flatten="false" todir="${dist.dir}/PP03ManagementClientClient">
+            <fileset dir="${dist.dir}/gfdeploy/PP03ManagementClient" includes="**/*.jar"/>
         </copy>
     </target>
     <target name="pre-run-deploy">
@@ -1283,9 +1269,7 @@ exists or setup the property manually. For example like this:
                 CLEANUP SECTION
                 ===============
             -->
-    <target depends="init" name="deps-clean" unless="no.deps">
-        <ant antfile="${project.PP03Library}/build.xml" inheritall="false" target="clean"/>
-    </target>
+    <target depends="init" name="deps-clean" unless="no.deps"/>
     <target depends="init" name="-do-clean">
         <delete dir="${build.dir}"/>
         <delete dir="${dist.dir}"/>

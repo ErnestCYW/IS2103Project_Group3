@@ -38,3 +38,5 @@ PP03Library/dist/
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
+/PP03ManagementClient/nbproject/private/
+/PP03ReservationClient/nbproject/private/
