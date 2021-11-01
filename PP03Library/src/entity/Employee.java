@@ -10,6 +10,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import util.enumeration.EmployeeRoleEnum;
 
 /**
  *
@@ -20,22 +21,37 @@ public class Employee implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long employeeid;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long employeeId;
+    private String firstName;
+    private String lastName;
     private String username;
+    private String password;
+    private EmployeeRoleEnum employeeRoleEnum;
 
-    public Long getId() {
-        return employeeid;
+    public Employee() {
     }
 
-    public void setId(Long id) {
-        this.employeeid = id;
+    public Employee(String firstName, String lastName, String username, String password, EmployeeRoleEnum employeeRoleEnum) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.username = username;
+        this.password = password;
+        this.employeeRoleEnum = employeeRoleEnum;
+    }
+    
+    public Long getEmployeeId() {
+        return employeeId;
+    }
+
+    public void setEmployeeId(Long id) {
+        this.employeeId = id;
     }
 
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (employeeid != null ? employeeid.hashCode() : 0);
+        hash += (employeeId != null ? employeeId.hashCode() : 0);
         return hash;
     }
 
@@ -46,7 +62,7 @@ public class Employee implements Serializable {
             return false;
         }
         Employee other = (Employee) object;
-        if ((this.employeeid == null && other.employeeid != null) || (this.employeeid != null && !this.employeeid.equals(other.employeeid))) {
+        if ((this.employeeId == null && other.employeeId != null) || (this.employeeId != null && !this.employeeId.equals(other.employeeId))) {
             return false;
         }
         return true;
@@ -54,7 +70,7 @@ public class Employee implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.Employee[ id=" + employeeid + " ]";
+        return "entity.Employee[ id=" + employeeId + " ]";
     }
 
     /**
@@ -69,6 +85,62 @@ public class Employee implements Serializable {
      */
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    /**
+     * @return the firstName
+     */
+    public String getFirstName() {
+        return firstName;
+    }
+
+    /**
+     * @param firstName the firstName to set
+     */
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    /**
+     * @return the lastName
+     */
+    public String getLastName() {
+        return lastName;
+    }
+
+    /**
+     * @param lastName the lastName to set
+     */
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    /**
+     * @return the password
+     */
+    public String getPassword() {
+        return password;
+    }
+
+    /**
+     * @param password the password to set
+     */
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    /**
+     * @return the employeeRoleEnum
+     */
+    public EmployeeRoleEnum getEmployeeRoleEnum() {
+        return employeeRoleEnum;
+    }
+
+    /**
+     * @param employeeRoleEnum the employeeRoleEnum to set
+     */
+    public void setEmployeeRoleEnum(EmployeeRoleEnum employeeRoleEnum) {
+        this.employeeRoleEnum = employeeRoleEnum;
     }
     
 }
