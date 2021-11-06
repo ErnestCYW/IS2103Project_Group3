@@ -7,8 +7,6 @@ package ejb.session.singleton;
 
 import ejb.session.stateless.EmployeeSessionBeanLocal;
 import entity.Employee;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Singleton;
