@@ -6,13 +6,15 @@
 package pp03managementclient;
 
 import ejb.session.stateless.EmployeeSessionBeanRemote;
+import ejb.session.stateless.PartnerSessionBeanRemote;
 import entity.Employee;
+import entity.Partner;
+import java.util.List;
 import java.util.Scanner;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import util.enumeration.EmployeeRoleEnum;
 import util.exception.EmployeeUsernameExistException;
 import util.exception.InvalidEmployeeRoleException;
+import util.exception.PartnerUsernameExistException;
 import util.exception.UnknownPersistenceException;
 
 /**
@@ -22,18 +24,20 @@ import util.exception.UnknownPersistenceException;
 public class SystemAdministrationModule {
     
     private EmployeeSessionBeanRemote employeeSessionBeanRemote;
+    private PartnerSessionBeanRemote partnerSessionBeanRemote;
     
     private Employee loggedInEmployee;
 
     public SystemAdministrationModule() {
     }
 
-    public SystemAdministrationModule(EmployeeSessionBeanRemote employeeSessionBeanRemote, Employee loggedInEmployee) {
+    public SystemAdministrationModule(EmployeeSessionBeanRemote employeeSessionBeanRemote, PartnerSessionBeanRemote partnerSessionBeanRemote, Employee loggedInEmployee) {
         this.employeeSessionBeanRemote = employeeSessionBeanRemote;
+        this.partnerSessionBeanRemote = partnerSessionBeanRemote;
         this.loggedInEmployee = loggedInEmployee;
     }
     
-    public void menuSystemAdminstration() throws InvalidEmployeeRoleException
+    public void menuSystemAdministration() throws InvalidEmployeeRoleException
     {
         if(loggedInEmployee.getEmployeeRoleEnum() != EmployeeRoleEnum.SYSTEM_ADMIN)
         {
@@ -65,7 +69,7 @@ public class SystemAdministrationModule {
                 }
                 else if(response == 2)
                 {
-                    //doViewAllEmployees();
+                    doViewAllEmployees();
                 }
                 else if(response == 3)
                 {
@@ -124,12 +128,70 @@ public class SystemAdministrationModule {
         }
         
         try {
-            employeeSessionBeanRemote.createNewEmployee(newEmployee);
+            Long employeeId = employeeSessionBeanRemote.createNewEmployee(newEmployee);
+            System.out.println("Employee ID " + employeeId + " created successfully!");
         } catch (EmployeeUsernameExistException ex) {
             System.out.println("Username already exist");
         } catch (UnknownPersistenceException ex) {
             System.out.println(ex.getMessage());
         }
+    }
+    
+    private void doViewAllEmployees()
+    {
+        Scanner scanner = new Scanner(System.in);
+        
+        System.out.println("*** View All Employees ***\n");
+        
+        List<Employee> employees = employeeSessionBeanRemote.retrieveAllEmployees();
+        System.out.printf("%8s%20s%20s%15s%20s%20s\n", "Employee ID", "First Name", "Last Name", "Employee Role", "Username", "Password");
+
+        for(Employee employee:employees)
+        {
+            System.out.printf("%8s%20s%20s%15s%20s%20s\n", employee.getEmployeeId().toString(), employee.getFirstName(), employee.getLastName(), employee.getEmployeeRoleEnum().toString(), employee.getUsername(), employee.getPassword());
+        }
+        
+        System.out.print("Press any key to continue...> ");
+        scanner.nextLine();
+    }
+    
+    private void doCreateNewPartner()
+    {
+        Scanner scanner = new Scanner(System.in);
+        Partner newPartner = new Partner();
+        
+        System.out.println("*** Create New Partner ***\n");
+        System.out.print("Enter Partner Name> ");
+        newPartner.setPartnerName(scanner.nextLine().trim());
+        System.out.print("Enter Password> ");
+        newPartner.setPassword(scanner.nextLine().trim());
+        
+        try {
+            Long partnerId = partnerSessionBeanRemote.createNewPartner(newPartner);
+            System.out.println("Partner ID " + partnerId + " created successfully!");
+        } catch (PartnerUsernameExistException ex) {
+            System.out.println("Username already exist");
+        } catch (UnknownPersistenceException ex) {
+            System.out.println(ex.getMessage());
+        }
+    }
+    
+    private void doViewAllPartners()
+    {
+        Scanner scanner = new Scanner(System.in);
+        
+        System.out.println("*** View All Partners ***\n");
+        
+        List<Partner> partners = partnerSessionBeanRemote.retrieveAllPartners();
+        System.out.printf("%10s%50s%40s\n", "Employee ID", "Partner Name", "Password");
+
+        for(Partner partner:partners)
+        {
+            System.out.printf("%10s%50s%40s\n", partner.getPartnerId().toString(), partner.getPartnerName(), partner.getPassword());
+        }
+        
+        System.out.print("Press any key to continue...> ");
+        scanner.nextLine();
     }
     
     

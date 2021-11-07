@@ -6,6 +6,7 @@
 package pp03managementclient;
 
 import ejb.session.stateless.EmployeeSessionBeanRemote;
+import ejb.session.stateless.PartnerSessionBeanRemote;
 import entity.Employee;
 import java.util.Scanner;
 import java.util.logging.Level;
@@ -19,6 +20,7 @@ import util.exception.InvalidLoginCredentialException;
  */
 public class MainApp {
     private EmployeeSessionBeanRemote employeeSessionBeanRemote;
+    private PartnerSessionBeanRemote partnerSessionBeanRemote;
 
     private SystemAdministrationModule systemAdministrationModule;
     
@@ -27,8 +29,9 @@ public class MainApp {
     public MainApp() {
     }
 
-    public MainApp(EmployeeSessionBeanRemote employeeSessionBeanRemote) {
+    public MainApp(EmployeeSessionBeanRemote employeeSessionBeanRemote, PartnerSessionBeanRemote partnerSessionBeanRemote) {
         this.employeeSessionBeanRemote = employeeSessionBeanRemote;
+        this.partnerSessionBeanRemote = partnerSessionBeanRemote;
     }
     
     public void runApp()
@@ -55,7 +58,7 @@ public class MainApp {
                         doLogin();
                         System.out.println("Login successful!\n");
 
-                        systemAdministrationModule = new SystemAdministrationModule(employeeSessionBeanRemote, loggedInEmployee);
+                        systemAdministrationModule = new SystemAdministrationModule(employeeSessionBeanRemote, partnerSessionBeanRemote, loggedInEmployee);
                         menuMain();
                     } 
                     catch (InvalidLoginCredentialException ex) {
@@ -108,10 +111,48 @@ public class MainApp {
     
     private void menuMain()
     {
-        try {
-            systemAdministrationModule.menuSystemAdminstration();
-        } catch (InvalidEmployeeRoleException ex) {
-            System.out.println(ex.getMessage());
+        Scanner scanner = new Scanner(System.in);
+        Integer response = 0;
+        
+        while(true)
+        {
+            System.out.println("*** HoRS Management System ***\n");
+            System.out.println("You are login as " + loggedInEmployee.getFirstName() + " " + loggedInEmployee.getLastName() + "\n");
+            System.out.println("1: System Administration");
+            System.out.println("2: Logout\n");
+            response = 0;
+            
+            while(response < 1 || response > 2)
+            {
+                System.out.print("> ");
+
+                response = scanner.nextInt();
+
+                if(response == 1)
+                {
+                    try
+                    {
+                        systemAdministrationModule.menuSystemAdministration();
+                    }
+                    catch (InvalidEmployeeRoleException ex)
+                    {
+                        System.out.println("Invalid option, please try again!: " + ex.getMessage() + "\n");
+                    }
+                }
+                else if (response == 2)
+                {
+                    break;
+                }
+                else
+                {
+                    System.out.println("Invalid option, please try again!\n");                
+                }
+            }
+            
+            if(response == 2)
+            {
+                break;
+            }
         }
     }
     
