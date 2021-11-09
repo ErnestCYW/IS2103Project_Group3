@@ -6,6 +6,7 @@
 package entity;
 
 import java.io.Serializable;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -13,6 +14,8 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
 import util.enumeration.RoomTypeNameEnum;
 
@@ -32,6 +35,16 @@ public class RoomType implements Serializable {
     @Column(nullable = false) 
     @NotNull
     private RoomTypeNameEnum RoomTypeName;
+    
+    @OneToMany(mappedBy = "roomType")
+    private List<Room> rooms;
+    
+    @OneToMany(mappedBy = "roomType")
+    private List<RoomRate> roomRates;
+    
+    @OneToOne(optional = false)
+    @NotNull
+    private RoomRate currentRoomRate;
     
     public RoomType() {
     }
@@ -86,6 +99,48 @@ public class RoomType implements Serializable {
      */
     public void setRoomTypeName(RoomTypeNameEnum RoomTypeName) {
         this.setRoomTypeName(RoomTypeName);
+    }
+
+    /**
+     * @return the rooms
+     */
+    public List<Room> getRooms() {
+        return rooms;
+    }
+
+    /**
+     * @param rooms the rooms to set
+     */
+    public void setRooms(List<Room> rooms) {
+        this.rooms = rooms;
+    }
+
+    /**
+     * @return the roomRates
+     */
+    public List<RoomRate> getRoomRates() {
+        return roomRates;
+    }
+
+    /**
+     * @param roomRates the roomRates to set
+     */
+    public void setRoomRates(List<RoomRate> roomRates) {
+        this.roomRates = roomRates;
+    }
+
+    /**
+     * @return the currentRoomRate
+     */
+    public RoomRate getCurrentRoomRate() {
+        return currentRoomRate;
+    }
+
+    /**
+     * @param currentRoomRate the currentRoomRate to set
+     */
+    public void setCurrentRoomRate(RoomRate currentRoomRate) {
+        this.currentRoomRate = currentRoomRate;
     }
     
 }

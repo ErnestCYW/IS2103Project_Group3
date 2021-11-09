@@ -10,14 +10,19 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import util.enumeration.RoomStatusEnum;
+import util.enumeration.RoomTypeNameEnum;
 
 /**
  *
@@ -41,8 +46,12 @@ public class Room implements Serializable {
     @Column(nullable = false) 
     @NotNull
     private RoomStatusEnum roomStatus;
+    
+    @ManyToOne(optional = false)
+    @JoinColumn(nullable = false)
+    private RoomTypeNameEnum roomType;
 
-    @OneToOne
+    @OneToOne(mappedBy = "room")
     private Reservation currentReservation;
     
     public Room() {
@@ -129,6 +138,20 @@ public class Room implements Serializable {
      */
     public void setCurrentReservation(Reservation currentReservation) {
         this.currentReservation = currentReservation;
+    }
+
+    /**
+     * @return the roomType
+     */
+    public RoomTypeNameEnum getRoomType() {
+        return roomType;
+    }
+
+    /**
+     * @param roomType the roomType to set
+     */
+    public void setRoomType(RoomTypeNameEnum roomType) {
+        this.roomType = roomType;
     }
     
 }
