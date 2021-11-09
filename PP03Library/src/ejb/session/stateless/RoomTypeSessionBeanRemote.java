@@ -18,7 +18,7 @@ import util.exception.UnknownPersistenceException;
  */
 @Remote
 public interface RoomTypeSessionBeanRemote {
-    
+
     public RoomType createNewRoomType(RoomType newRoomTypeEntity) throws UnknownPersistenceException, InputDataValidationException;
 
     public RoomType viewRoomTypeDetails(Long roomTypeId) throws RoomTypeNotFoundException;
@@ -26,5 +26,7 @@ public interface RoomTypeSessionBeanRemote {
     public void deleteRoomType(Long roomTypeId) throws RoomTypeNotFoundException;
 
     public List<RoomType> viewAllRoomTypes();
-    
+
+    public RoomType updateRoomType(RoomType roomTypeEntity) throws RoomTypeNotFoundException, InputDataValidationException;
+
 }

@@ -91,16 +91,17 @@ public class RoomSessionBean implements RoomSessionBeanRemote, RoomSessionBeanLo
             Set<ConstraintViolation<Room>> constraintViolations = validator.validate(roomEntity);
 
             if (constraintViolations.isEmpty()) {
-                RoomType roomType = roomTypeSessionBean.viewRoomTypeDetails(roomTypeId);
                 Room roomEntityToUpdate = viewRoom(roomEntity.getRoomId());
 
                 roomEntityToUpdate.setNumber(roomEntity.getNumber());
                 roomEntityToUpdate.setStatus(roomEntity.getStatus());
+                
+                RoomType roomType = roomTypeSessionBean.viewRoomTypeDetails(roomTypeId);
+                
                 roomEntityToUpdate.setRoomType(roomType);
                 roomType.getRooms().add(roomEntityToUpdate);
 
                 return roomEntityToUpdate;
-
             } else {
                 throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
             }

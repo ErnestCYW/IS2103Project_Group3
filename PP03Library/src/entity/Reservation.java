@@ -47,6 +47,15 @@ public class Reservation implements Serializable {
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private RoomType roomType;
+    
+    public Reservation() {
+    }
+    
+    public Reservation(Date startDate, Date endDate) {
+        this();
+        this.startDate = startDate;
+        this.endDate = endDate;
+    }
 
     public Long getReservationId() {
         return reservationId;

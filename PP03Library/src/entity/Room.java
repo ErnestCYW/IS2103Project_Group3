@@ -54,12 +54,11 @@ public class Room implements Serializable {
     public Room() {
     }
     
-    public Room(Long roomId, String roomNumber, RoomStatusEnum status, Reservation currentReservation) {
+    public Room(Long roomId, String number, RoomStatusEnum status) {
         this();
         this.roomId = roomId;
-        this.number = roomNumber;
+        this.number = number;
         this.status = status;
-        this.currentReservation = currentReservation;
     }
 
     public Long getRoomId() {

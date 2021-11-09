@@ -35,32 +35,36 @@ public class RoomRate implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long roomRateId;
-    
+
+    @Column(nullable = false)
+    @NotNull
+    private String name;
+
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false) 
+    @Column(nullable = false)
     @NotNull
     private RoomRateTypeEnum roomRateType;
-    
+
     @Column(nullable = false, precision = 11, scale = 2)
     @NotNull
     @DecimalMin("0.00")
     @Digits(integer = 9, fraction = 2) // 11 - 2 digits to the left of the decimal point
     private BigDecimal rate;
-    
+
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(nullable = false)
-    @NotNull
     private Date startDate;
-    
+
     @Temporal(TemporalType.TIMESTAMP)
+    private Date endDate;
+
     @Column(nullable = false)
     @NotNull
-    private Date endDate;
-    
+    private boolean disabled;
+
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private RoomType roomType;
-    
+
     public RoomRate() {
     }
 
@@ -70,8 +74,9 @@ public class RoomRate implements Serializable {
         this.rate = rate;
         this.startDate = startDate;
         this.endDate = endDate;
+        this.disabled = false;
     }
-    
+
     public Long getRoomRateId() {
         return roomRateId;
     }
@@ -174,5 +179,33 @@ public class RoomRate implements Serializable {
     public void setRoomType(RoomType roomType) {
         this.roomType = roomType;
     }
-    
+
+    /**
+     * @return the name
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * @param name the name to set
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+     * @return the disabled
+     */
+    public boolean isDisabled() {
+        return disabled;
+    }
+
+    /**
+     * @param disabled the disabled to set
+     */
+    public void setDisabled(boolean disabled) {
+        this.disabled = disabled;
+    }
+
 }

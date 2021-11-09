@@ -26,5 +26,7 @@ public interface RoomTypeSessionBeanLocal {
     public void deleteRoomType(Long roomTypeId) throws RoomTypeNotFoundException;
 
     public List<RoomType> viewAllRoomTypes();
+
+    public RoomType updateRoomType(RoomType roomTypeEntity) throws RoomTypeNotFoundException, InputDataValidationException;
     
 }
