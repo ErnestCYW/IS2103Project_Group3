@@ -17,7 +17,6 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
-import util.enumeration.RoomTypeNameEnum;
 
 /**
  *
@@ -25,19 +24,45 @@ import util.enumeration.RoomTypeNameEnum;
  */
 @Entity
 public class RoomType implements Serializable {
-
+    
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long RoomTypeId;
+    private Long roomTypeId;
     
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false) 
     @NotNull
-    private RoomTypeNameEnum RoomTypeName;
+    private String name;
+    
+    @Column(nullable = false)
+    @NotNull
+    private String description;
+    
+    @Column(nullable = false)
+    @NotNull
+    private String size;
+    
+    @Column(nullable = false)
+    @NotNull
+    private String bed;
+    
+    @Column(nullable = false)
+    @NotNull
+    private Integer capacity;
+    
+    @Column(nullable = false)
+    @NotNull
+    private List<String> amenities;
+    
+    @Column(nullable = false)
+    @NotNull
+    private boolean disabled;
     
     @OneToMany(mappedBy = "roomType")
     private List<Room> rooms;
+    
+    @OneToMany(mappedBy = "roomType")
+    private List<Reservation> reservations;
     
     @OneToMany(mappedBy = "roomType")
     private List<RoomRate> roomRates;
@@ -49,34 +74,34 @@ public class RoomType implements Serializable {
     public RoomType() {
     }
     
-    public RoomType(RoomTypeNameEnum RoomTypeName){
+    public RoomType(String name){
         this();
-        this.RoomTypeName = RoomTypeName;
+        this.name = name;
     }
 
     public Long getRoomTypeId() {
-        return RoomTypeId;
+        return roomTypeId;
     }
 
-    public void setRoomTypeId(Long RoomTypeId) {
-        this.RoomTypeId = RoomTypeId;
+    public void setRoomTypeId(Long roomTypeId) {
+        this.roomTypeId = roomTypeId;
     }
 
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (RoomTypeId != null ? RoomTypeId.hashCode() : 0);
+        hash += (roomTypeId != null ? roomTypeId.hashCode() : 0);
         return hash;
     }
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the RoomTypeId fields are not set
+        // TODO: Warning - this method won't work in the case the roomTypeId fields are not set
         if (!(object instanceof RoomType)) {
             return false;
         }
         RoomType other = (RoomType) object;
-        if ((this.RoomTypeId == null && other.RoomTypeId != null) || (this.RoomTypeId != null && !this.RoomTypeId.equals(other.RoomTypeId))) {
+        if ((this.roomTypeId == null && other.roomTypeId != null) || (this.roomTypeId != null && !this.roomTypeId.equals(other.roomTypeId))) {
             return false;
         }
         return true;
@@ -84,21 +109,21 @@ public class RoomType implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.RoomType[ id=" + RoomTypeId + " ]";
+        return "entity.RoomType[ id=" + roomTypeId + " ]";
     }
 
     /**
-     * @return the RoomTypeName
+     * @return the name
      */
-    public RoomTypeNameEnum getRoomTypeName() {
-        return RoomTypeName;
+    public String getName() {
+        return name;
     }
 
     /**
-     * @param RoomTypeName the RoomTypeName to set
+     * @param name the name to set
      */
-    public void setRoomTypeName(RoomTypeNameEnum RoomTypeName) {
-        this.setRoomTypeName(RoomTypeName);
+    public void setName(String name) {
+        this.setName(name);
     }
 
     /**
@@ -141,6 +166,104 @@ public class RoomType implements Serializable {
      */
     public void setCurrentRoomRate(RoomRate currentRoomRate) {
         this.currentRoomRate = currentRoomRate;
+    }
+
+    /**
+     * @return the description
+     */
+    public String getDescription() {
+        return description;
+    }
+
+    /**
+     * @param description the description to set
+     */
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    /**
+     * @return the size
+     */
+    public String getSize() {
+        return size;
+    }
+
+    /**
+     * @param size the size to set
+     */
+    public void setSize(String size) {
+        this.size = size;
+    }
+
+    /**
+     * @return the bed
+     */
+    public String getBed() {
+        return bed;
+    }
+
+    /**
+     * @param bed the bed to set
+     */
+    public void setBed(String bed) {
+        this.bed = bed;
+    }
+
+    /**
+     * @return the capacity
+     */
+    public Integer getCapacity() {
+        return capacity;
+    }
+
+    /**
+     * @param capacity the capacity to set
+     */
+    public void setCapacity(Integer capacity) {
+        this.capacity = capacity;
+    }
+
+    /**
+     * @return the amenities
+     */
+    public List<String> getAmenities() {
+        return amenities;
+    }
+
+    /**
+     * @param amenities the amenities to set
+     */
+    public void setAmenities(List<String> amenities) {
+        this.amenities = amenities;
+    }
+    
+        /**
+     * @return the disabled
+     */
+    public boolean isDisabled() {
+        return disabled;
+    }
+
+    /**
+     * @param disabled the disabled to set
+     */
+    public void setDisabled(boolean disabled) {
+        this.disabled = disabled;
+    }
+    
+    /**
+     * @return the reservations
+     */
+    public List<Reservation> getReservations() {
+        return reservations;
+    }
+
+    /**
+     * @param reservations the reservations to set
+     */
+    public void setReservations(List<Reservation> reservations) {
+        this.reservations = reservations;
     }
     
 }

@@ -3,18 +3,19 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package util.enumeration;
+package util.exception;
 
 /**
  *
  * @author ernestcyw
  */
-public enum RoomTypeNameEnum {
-    
-    DELUXE,
-    PREMIER,
-    FAMILY,
-    JUNIOR,
-    GRAND
-    
+public class RoomTypeNotFoundException extends Exception {
+
+    public RoomTypeNotFoundException() {
+    }
+
+    public RoomTypeNotFoundException(String msg) {
+        super(msg);
+    }
+
 }

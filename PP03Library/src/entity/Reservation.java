@@ -9,11 +9,11 @@ import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -29,7 +29,7 @@ public class Reservation implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long ReservationId;
+    private Long reservationId;
     
     @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false)
@@ -44,22 +44,22 @@ public class Reservation implements Serializable {
     @OneToOne
     private Room room;
     
-    @OneToOne(optional = false)
-    @NotNull
+    @ManyToOne(optional = false)
+    @JoinColumn(nullable = false)
     private RoomType roomType;
 
     public Long getReservationId() {
-        return ReservationId;
+        return reservationId;
     }
 
     public void setReservationId(Long ReservationId) {
-        this.ReservationId = ReservationId;
+        this.reservationId = ReservationId;
     }
     
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (ReservationId != null ? ReservationId.hashCode() : 0);
+        hash += (reservationId != null ? reservationId.hashCode() : 0);
         return hash;
     }
 
@@ -70,7 +70,7 @@ public class Reservation implements Serializable {
             return false;
         }
         Reservation other = (Reservation) object;
-        if ((this.ReservationId == null && other.ReservationId != null) || (this.ReservationId != null && !this.ReservationId.equals(other.ReservationId))) {
+        if ((this.reservationId == null && other.reservationId != null) || (this.reservationId != null && !this.reservationId.equals(other.reservationId))) {
             return false;
         }
         return true;
@@ -78,7 +78,7 @@ public class Reservation implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.Reservation[ id=" + ReservationId + " ]";
+        return "entity.Reservation[ id=" + reservationId + " ]";
     }
     
     /**

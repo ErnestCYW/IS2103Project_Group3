@@ -5,7 +5,12 @@
  */
 package ejb.session.stateless;
 
+import entity.RoomType;
+import java.util.List;
 import javax.ejb.Local;
+import util.exception.InputDataValidationException;
+import util.exception.RoomTypeNotFoundException;
+import util.exception.UnknownPersistenceException;
 
 /**
  *
@@ -13,5 +18,13 @@ import javax.ejb.Local;
  */
 @Local
 public interface RoomTypeSessionBeanLocal {
+
+    public RoomType createNewRoomType(RoomType newRoomTypeEntity) throws UnknownPersistenceException, InputDataValidationException;
+
+    public RoomType viewRoomTypeDetails(Long roomTypeId) throws RoomTypeNotFoundException;
+
+    public void deleteRoomType(Long roomTypeId) throws RoomTypeNotFoundException;
+
+    public List<RoomType> viewAllRoomTypes();
     
 }
