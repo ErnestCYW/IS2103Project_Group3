@@ -3,6 +3,10 @@
   <persistence-unit name="PP03-ejbPU" transaction-type="JTA">
     <jta-data-source>jdbc/PP03</jta-data-source>
     <class>entity.Employee</class>
+    <class>entity.Room</class>
+    <class>entity.Reservation</class>
+    <class>entity.RoomRate</class>
+    <class>entity.RoomType</class>
     <class>entity.Partner</class>
     <class>entity.Guest</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>

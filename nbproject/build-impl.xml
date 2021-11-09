@@ -300,7 +300,6 @@ exists or setup the property manually. For example like this:
     <target name="-run-deploy-am" unless="no.deps">
         <!-- Task to deploy to the Access Manager runtime. -->
         <ant antfile="${project.PP03-ejb}/build.xml" inheritall="false" target="-run-deploy-am"/>
-        <ant antfile="${project.PP03Client}/build.xml" inheritall="false" target="-run-deploy-am"/>
         <ant antfile="${project.PP03ManagementClient}/build.xml" inheritall="false" target="-run-deploy-am"/>
     </target>
     <target depends="-init-cos,dist-directory-deploy,pre-run-deploy,-pre-nbmodule-run-deploy,-run-deploy-nb,-init-deploy-ant,-deploy-ant,-run-deploy-am,-post-nbmodule-run-deploy,post-run-deploy" name="run-deploy"/>
