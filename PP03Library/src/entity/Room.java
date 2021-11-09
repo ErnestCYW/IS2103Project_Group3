@@ -37,12 +37,12 @@ public class Room implements Serializable {
     @NotNull
     @Size(min = 1, max = 4)
     @Digits(integer = 4, fraction =0)
-    private String roomNumber;
+    private String number;
     
     @Enumerated(EnumType.STRING)
     @Column(nullable = false) 
     @NotNull
-    private RoomStatusEnum roomStatus;
+    private RoomStatusEnum status;
     
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
@@ -57,8 +57,8 @@ public class Room implements Serializable {
     public Room(Long roomId, String roomNumber, RoomStatusEnum status, Reservation currentReservation) {
         this();
         this.roomId = roomId;
-        this.roomNumber = roomNumber;
-        this.roomStatus = status;
+        this.number = roomNumber;
+        this.status = status;
         this.currentReservation = currentReservation;
     }
 
@@ -96,31 +96,31 @@ public class Room implements Serializable {
     }
     
     /**
-     * @return the roomNumber
+     * @return the number
      */
-    public String getRoomNumber() {
-        return roomNumber;
+    public String getNumber() {
+        return number;
     }
 
     /**
-     * @param roomNumber the roomNumber to set
+     * @param number the number to set
      */
-    public void setRoomNumber(String roomNumber) {
-        this.roomNumber = roomNumber;
+    public void setNumber(String number) {
+        this.number = number;
     }
     
         /**
-     * @return the roomStatus
+     * @return the status
      */
-    public RoomStatusEnum getRoomStatus() {
-        return roomStatus;
+    public RoomStatusEnum getStatus() {
+        return status;
     }
 
     /**
-     * @param roomStatus the roomStatus to set
+     * @param status the status to set
      */
-    public void setRoomStatus(RoomStatusEnum roomStatus) {
-        this.roomStatus = roomStatus;
+    public void setStatus(RoomStatusEnum status) {
+        this.status = status;
     }
 
     /**

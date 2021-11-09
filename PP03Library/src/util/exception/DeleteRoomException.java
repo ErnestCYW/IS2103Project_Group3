@@ -3,15 +3,19 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package util.enumeration;
+package util.exception;
 
 /**
  *
  * @author ernestcyw
  */
-public enum RoomStatusEnum {
-    
-    AVAILABLE,
-    UNAVAILABLE,
-    
+public class DeleteRoomException extends Exception {
+
+    public DeleteRoomException() {
+    }
+
+    public DeleteRoomException(String msg) {
+        super(msg);
+    }
+
 }

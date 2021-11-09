@@ -5,7 +5,14 @@
  */
 package ejb.session.stateless;
 
+import entity.Room;
+import java.util.List;
 import javax.ejb.Remote;
+import util.exception.DeleteRoomException;
+import util.exception.InputDataValidationException;
+import util.exception.RoomNotFoundException;
+import util.exception.RoomTypeNotFoundException;
+import util.exception.UnknownPersistenceException;
 
 /**
  *
@@ -13,5 +20,13 @@ import javax.ejb.Remote;
  */
 @Remote
 public interface RoomSessionBeanRemote {
-    
+
+    public Room createNewRoom(Long roomTypeId, Room newRoomEntity) throws UnknownPersistenceException, InputDataValidationException, RoomTypeNotFoundException;
+
+    public Room updateRoom(Long roomTypeId, Room roomEntity) throws RoomTypeNotFoundException, InputDataValidationException, RoomNotFoundException;
+
+    public void deleteRoom(Long roomId) throws RoomNotFoundException, DeleteRoomException;
+
+    public List<Room> viewAllRooms();
+
 }
