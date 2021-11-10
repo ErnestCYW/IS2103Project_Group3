@@ -123,7 +123,7 @@ public class RoomRateSessionBean implements RoomRateSessionBeanRemote, RoomRateS
 
         RoomType roomType = roomRateEntityToRemove.getRoomType();
 
-        if (roomType.getCurrentRoomRate().equals(roomRateEntityToRemove)) {
+        if (roomType.getCurrentRoomRate().equals(roomRateEntityToRemove)) { //Change current room rate to reservation beginning and starting within start end date in room rate
             roomRateEntityToRemove.setDisabled(true);
         } else {
             roomType.getRoomRates().remove(roomRateEntityToRemove);
