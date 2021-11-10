@@ -19,7 +19,6 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
-import util.exception.DeleteRoomException;
 import util.exception.InputDataValidationException;
 import util.exception.RoomNotFoundException;
 import util.exception.RoomTypeNotFoundException;
@@ -73,7 +72,6 @@ public class RoomSessionBean implements RoomSessionBeanRemote, RoomSessionBeanLo
         }
     }
 
-    //Helper function
     private Room viewRoom(Long roomId) throws RoomNotFoundException {
         Room roomEntity = em.find(Room.class, roomId);
 
@@ -95,9 +93,9 @@ public class RoomSessionBean implements RoomSessionBeanRemote, RoomSessionBeanLo
 
                 roomEntityToUpdate.setNumber(roomEntity.getNumber());
                 roomEntityToUpdate.setStatus(roomEntity.getStatus());
-                
+
                 RoomType roomType = roomTypeSessionBean.viewRoomTypeDetails(roomTypeId);
-                
+
                 roomEntityToUpdate.setRoomType(roomType);
                 roomType.getRooms().add(roomEntityToUpdate);
 
@@ -111,23 +109,23 @@ public class RoomSessionBean implements RoomSessionBeanRemote, RoomSessionBeanLo
     }
 
     @Override
-    public void deleteRoom(Long roomId) throws RoomNotFoundException, DeleteRoomException {
+    public void deleteRoom(Long roomId) throws RoomNotFoundException {
         Room roomEntityToRemove = viewRoom(roomId);
-        
+
         if (roomEntityToRemove.getCurrentReservation() == null) {
-            throw new DeleteRoomException("Room Id: " + roomId + " is currently in use");
+            roomEntityToRemove.setDisabled(true);
         } else {
             RoomType roomType = roomEntityToRemove.getRoomType();
             roomType.getRooms().remove(roomEntityToRemove);
-            
+
             em.remove(roomEntityToRemove);
         }
     }
-    
+
     @Override
     public List<Room> viewAllRooms() {
         Query query = em.createQuery("SELECT r FROM Room r ORDER BY r.roomId ASC");
-        
+
         return query.getResultList();
     }
 

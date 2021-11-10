@@ -32,33 +32,38 @@ public class Room implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long roomId;
-    
+
     @Column(nullable = false, length = 4) //More than 99 floors and 99 rooms per floor?
     @NotNull
     @Size(min = 1, max = 4)
-    @Digits(integer = 4, fraction =0)
+    @Digits(integer = 4, fraction = 0)
     private String number;
-    
+
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false) 
+    @Column(nullable = false)
     @NotNull
     private RoomStatusEnum status;
-    
+
+    @Column(nullable = false)
+    @NotNull
+    private boolean disabled;
+
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private RoomType roomType;
 
     @OneToOne(mappedBy = "room")
     private Reservation currentReservation;
-    
+
     public Room() {
     }
-    
+
     public Room(Long roomId, String number, RoomStatusEnum status) {
         this();
         this.roomId = roomId;
         this.number = number;
         this.status = status;
+        this.disabled = false;
     }
 
     public Long getRoomId() {
@@ -68,14 +73,14 @@ public class Room implements Serializable {
     public void setRoomId(Long roomId) {
         this.roomId = roomId;
     }
-    
+
     @Override
     public int hashCode() {
         int hash = 0;
         hash += (roomId != null ? roomId.hashCode() : 0);
         return hash;
     }
-    
+
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the roomId fields are not set
@@ -93,7 +98,7 @@ public class Room implements Serializable {
     public String toString() {
         return "entity.Room[ id=" + roomId + " ]";
     }
-    
+
     /**
      * @return the number
      */
@@ -107,8 +112,8 @@ public class Room implements Serializable {
     public void setNumber(String number) {
         this.number = number;
     }
-    
-        /**
+
+    /**
      * @return the status
      */
     public RoomStatusEnum getStatus() {
@@ -149,5 +154,19 @@ public class Room implements Serializable {
     public void setRoomType(RoomType roomType) {
         this.roomType = roomType;
     }
-    
+
+    /**
+     * @return the disabled
+     */
+    public boolean isDisabled() {
+        return disabled;
+    }
+
+    /**
+     * @param disabled the disabled to set
+     */
+    public void setDisabled(boolean disabled) {
+        this.disabled = disabled;
+    }
+
 }

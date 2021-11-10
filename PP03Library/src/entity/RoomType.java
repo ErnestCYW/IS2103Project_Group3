@@ -6,6 +6,7 @@
 package entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -67,8 +68,7 @@ public class RoomType implements Serializable {
     @OneToMany(mappedBy = "roomType")
     private List<RoomRate> roomRates;
     
-    @OneToOne(optional = false)
-    @NotNull
+    @OneToOne
     private RoomRate currentRoomRate;
     
     public RoomType() {
@@ -83,6 +83,9 @@ public class RoomType implements Serializable {
         this.capacity = capacity;
         this.amenities = amenities;
         this.disabled = false;
+        this.rooms = new ArrayList<>();
+        this.reservations = new ArrayList<>();
+        this.roomRates = new ArrayList<>();
     }
 
     public Long getRoomTypeId() {

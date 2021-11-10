@@ -7,9 +7,13 @@ package ejb.session.stateless;
 
 import entity.Reservation;
 import entity.Room;
+import entity.RoomRate;
 import entity.RoomType;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -20,6 +24,7 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import util.exception.InputDataValidationException;
+import util.exception.RoomRateNotFoundException;
 import util.exception.RoomTypeNotFoundException;
 import util.exception.UnknownPersistenceException;
 
@@ -29,6 +34,9 @@ import util.exception.UnknownPersistenceException;
  */
 @Stateless
 public class RoomTypeSessionBean implements RoomTypeSessionBeanRemote, RoomTypeSessionBeanLocal {
+
+    @EJB
+    private RoomRateSessionBeanLocal roomRateSessionBean;
 
     @PersistenceContext(unitName = "PP03-ejbPU")
     private EntityManager em;
@@ -52,7 +60,7 @@ public class RoomTypeSessionBean implements RoomTypeSessionBeanRemote, RoomTypeS
             try {
                 em.persist(newRoomTypeEntity);
                 em.flush();
-                //Need to associate a new room rate here... unless can set the current room rate to null and roomrates can be null
+
                 return newRoomTypeEntity;
             } catch (PersistenceException ex) {
                 throw new UnknownPersistenceException(ex.getMessage());
@@ -82,27 +90,12 @@ public class RoomTypeSessionBean implements RoomTypeSessionBeanRemote, RoomTypeS
             if (constraintViolations.isEmpty()) {
                 RoomType roomTypeEntityToUpdate = viewRoomTypeDetails(roomTypeEntity.getRoomTypeId());
 
-                //If want to implement such that can rename:
                 roomTypeEntityToUpdate.setName(roomTypeEntity.getName());
                 roomTypeEntityToUpdate.setDescription(roomTypeEntity.getDescription());
                 roomTypeEntityToUpdate.setSize(roomTypeEntity.getSize());
                 roomTypeEntityToUpdate.setBed(roomTypeEntity.getBed());
                 roomTypeEntityToUpdate.setAmenities(roomTypeEntity.getAmenities());
 
-                /**
-                 * No renaming allowed -> must define and throw a new error
-                 * UpdateRoomTypeExceptions
-                 * if(roomTypeEntityToUpdate.getName().equals(roomTypeEntity.getName()))
-                 * {
-                 * roomTypeEntityToUpdate.setDescription(roomTypeEntity.getDescription());
-                 * roomTypeEntityToUpdate.setSize(roomTypeEntity.getSize());
-                 * roomTypeEntityToUpdate.setBed(roomTypeEntity.getBed());
-                 * roomTypeEntityToUpdate.setAmenities(roomTypeEntity.getAmenities());
-                 * } else { throw new UpdateRoomTypeException("Name of room type
-                 * to be updated does not match the existing record") }
-                *
-                 */
-                //Need to associate a new room rate here... unless can set the current room rate to null and roomrates can be null
                 return roomTypeEntityToUpdate;
             } else {
                 throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
@@ -113,13 +106,20 @@ public class RoomTypeSessionBean implements RoomTypeSessionBeanRemote, RoomTypeS
     }
 
     @Override
-    public void deleteRoomType(Long roomTypeId) throws RoomTypeNotFoundException {
+    public void deleteRoomType(Long roomTypeId) throws RoomTypeNotFoundException, RoomRateNotFoundException {
         RoomType roomTypeEntityToRemove = viewRoomTypeDetails(roomTypeId);
 
         List<Room> rooms = roomTypeEntityToRemove.getRooms();
         List<Reservation> reservations = roomTypeEntityToRemove.getReservations();
 
         if (rooms.isEmpty() & reservations.isEmpty()) {
+            roomTypeEntityToRemove.setCurrentRoomRate(null);
+            List<RoomRate> roomRates = roomTypeEntityToRemove.getRoomRates();
+
+            for (RoomRate roomRate : roomRates) {
+                roomRateSessionBean.deleteRoomRate(roomRate.getRoomRateId());   //Deleting Room Type deletes all its associated room rates that are not in use
+            }                                                                   //RoomRateNotFoundException will never be thrown
+
             em.remove(roomTypeEntityToRemove);
         } else {
             roomTypeEntityToRemove.setDisabled(true);
