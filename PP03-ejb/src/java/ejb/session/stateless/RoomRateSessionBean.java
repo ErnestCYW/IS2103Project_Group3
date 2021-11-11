@@ -5,6 +5,7 @@
  */
 package ejb.session.stateless;
 
+import entity.Reservation;
 import entity.RoomRate;
 import entity.RoomType;
 import java.util.List;
@@ -103,7 +104,7 @@ public class RoomRateSessionBean implements RoomRateSessionBeanRemote, RoomRateS
                 RoomType roomType = roomTypeSessionBean.viewRoomTypeDetails(roomTypeId);
 
                 roomRateEntityToUpdate.setRoomType(roomType);
-                if (!roomType.getRoomRates().contains(roomRateEntityToUpdate)) {    
+                if (!roomType.getRoomRates().contains(roomRateEntityToUpdate)) {
                     roomType.getRoomRates().add(roomRateEntityToUpdate);
                 }
 
@@ -121,13 +122,12 @@ public class RoomRateSessionBean implements RoomRateSessionBeanRemote, RoomRateS
     public void deleteRoomRate(Long roomRateId) throws RoomRateNotFoundException {
         RoomRate roomRateEntityToRemove = viewRoomRateDetails(roomRateId);
 
-        RoomType roomType = roomRateEntityToRemove.getRoomType();
+        List<Reservation> reservations = roomRateEntityToRemove.getReservations();
 
-        if (roomType.getCurrentRoomRate().equals(roomRateEntityToRemove)) { //Change current room rate to reservation beginning and starting within start end date in room rate
-            roomRateEntityToRemove.setDisabled(true);
-        } else {
-            roomType.getRoomRates().remove(roomRateEntityToRemove);
+        if (reservations.isEmpty()) {               //Check that all reservations using this rate has passed then can delete
             em.remove(roomRateEntityToRemove);
+        } else {
+            roomRateEntityToRemove.setDisabled(true);
         }
     }
 

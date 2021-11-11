@@ -10,13 +10,10 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -67,9 +64,6 @@ public class RoomType implements Serializable {
     
     @OneToMany(mappedBy = "roomType")
     private List<RoomRate> roomRates;
-    
-    @OneToOne
-    private RoomRate currentRoomRate;
     
     public RoomType() {
     }
@@ -161,20 +155,6 @@ public class RoomType implements Serializable {
      */
     public void setRoomRates(List<RoomRate> roomRates) {
         this.roomRates = roomRates;
-    }
-
-    /**
-     * @return the currentRoomRate
-     */
-    public RoomRate getCurrentRoomRate() {
-        return currentRoomRate;
-    }
-
-    /**
-     * @param currentRoomRate the currentRoomRate to set
-     */
-    public void setCurrentRoomRate(RoomRate currentRoomRate) {
-        this.currentRoomRate = currentRoomRate;
     }
 
     /**

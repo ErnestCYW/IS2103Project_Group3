@@ -113,7 +113,6 @@ public class RoomTypeSessionBean implements RoomTypeSessionBeanRemote, RoomTypeS
         List<Reservation> reservations = roomTypeEntityToRemove.getReservations();
 
         if (rooms.isEmpty() & reservations.isEmpty()) {
-            roomTypeEntityToRemove.setCurrentRoomRate(null);
             List<RoomRate> roomRates = roomTypeEntityToRemove.getRoomRates();
 
             for (RoomRate roomRate : roomRates) {

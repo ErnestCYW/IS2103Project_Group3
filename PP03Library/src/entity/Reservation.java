@@ -30,31 +30,40 @@ public class Reservation implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long reservationId;
-    
+
     @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false)
     @NotNull
     private Date startDate;
-    
+
     @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false)
     @NotNull
     private Date endDate;
-    
+
+    @Column(nullable = false)
+    @NotNull
+    private boolean passed;
+
     @OneToOne
     private Room room;
-    
+
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private RoomType roomType;
-    
+
+    @ManyToOne(optional = false)
+    @JoinColumn(nullable = false)
+    private RoomRate roomRate;
+
     public Reservation() {
     }
-    
+
     public Reservation(Date startDate, Date endDate) {
         this();
         this.startDate = startDate;
         this.endDate = endDate;
+        this.passed = false;
     }
 
     public Long getReservationId() {
@@ -64,7 +73,7 @@ public class Reservation implements Serializable {
     public void setReservationId(Long ReservationId) {
         this.reservationId = ReservationId;
     }
-    
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -89,7 +98,7 @@ public class Reservation implements Serializable {
     public String toString() {
         return "entity.Reservation[ id=" + reservationId + " ]";
     }
-    
+
     /**
      * @return the startDate
      */
@@ -145,5 +154,19 @@ public class Reservation implements Serializable {
     public void setRoomType(RoomType roomType) {
         this.roomType = roomType;
     }
-    
+
+    /**
+     * @return the roomRate
+     */
+    public RoomRate getRoomRate() {
+        return roomRate;
+    }
+
+    /**
+     * @param roomRate the roomRate to set
+     */
+    public void setRoomRate(RoomRate roomRate) {
+        this.roomRate = roomRate;
+    }
+
 }

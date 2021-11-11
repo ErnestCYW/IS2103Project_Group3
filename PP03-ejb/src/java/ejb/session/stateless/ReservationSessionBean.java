@@ -56,7 +56,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
 
             try {
                 
-               RoomType roomType = roomTypeSessionBean.viewRoomTypeDetails(roomTypeId);
+               RoomType roomType = roomTypeSessionBean.viewRoomTypeDetails(roomTypeId);         //Need to associate roomRate here as well, check startDate endDate 
                newReservationEntity.setRoomType(roomType);
                roomType.getReservations().add(newReservationEntity);
                
