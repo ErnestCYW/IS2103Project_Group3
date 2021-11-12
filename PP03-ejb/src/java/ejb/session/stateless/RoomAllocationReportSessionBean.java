@@ -7,10 +7,12 @@ package ejb.session.stateless;
 
 import entity.RoomAllocationReport;
 import java.util.Date;
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import util.exception.CannotGetTodayDateException;
 
 /**
  *
@@ -19,15 +21,18 @@ import javax.persistence.Query;
 @Stateless
 public class RoomAllocationReportSessionBean implements RoomAllocationReportSessionBeanRemote, RoomAllocationReportSessionBeanLocal {
 
+    @EJB
+    private HandleDateTimeSessionBeanLocal handleDateTimeSessionBean;
+    
     @PersistenceContext(unitName = "PP03-ejbPU")
     private EntityManager em;
 
     // Add business logic below. (Right-click in editor and choose
     // "Insert Code > Add Business Method")
     @Override
-    public RoomAllocationReport createRoomAllocationReport() {
+    public RoomAllocationReport createRoomAllocationReport() throws CannotGetTodayDateException{
         
-        RoomAllocationReport newRoomAllocationReportEntity = new RoomAllocationReport();
+        RoomAllocationReport newRoomAllocationReportEntity = new RoomAllocationReport(handleDateTimeSessionBean.getTodayDate());
         
         em.persist(newRoomAllocationReportEntity);
         em.flush();
@@ -56,7 +61,7 @@ public class RoomAllocationReportSessionBean implements RoomAllocationReportSess
     @Override
     public void deleteRoomAllocationReport(Long roomAllocationReportId) {
         
-        RoomAllocationReport roomAllocationReportToRemove = viewRoomAllocationReport(roomAllocationReportId);
+        RoomAllocationReport roomAllocationReportToRemove = em.find(RoomAllocationReport.class, roomAllocationReportId);
         
         em.remove(roomAllocationReportToRemove);
     }

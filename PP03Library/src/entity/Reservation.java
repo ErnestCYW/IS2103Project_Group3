@@ -14,7 +14,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.Future;
@@ -44,19 +43,9 @@ public class Reservation implements Serializable {
     @Future
     private Date endDate;
 
-    @Column(nullable = false)
-    @NotNull
-    private boolean passed;
-
-    @OneToOne
-    private Room room;
-
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private RoomType roomType;
-
-    @ManyToOne
-    private RoomRate roomRate;
 
     public Reservation() {
     }
@@ -65,7 +54,6 @@ public class Reservation implements Serializable {
         this();
         this.startDate = startDate;
         this.endDate = endDate;
-        this.passed = false;
     }
 
     public Long getReservationId() {
@@ -130,20 +118,6 @@ public class Reservation implements Serializable {
     }
 
     /**
-     * @return the room
-     */
-    public Room getRoom() {
-        return room;
-    }
-
-    /**
-     * @param room the room to set
-     */
-    public void setRoom(Room room) {
-        this.room = room;
-    }
-
-    /**
      * @return the roomType
      */
     public RoomType getRoomType() {
@@ -155,20 +129,6 @@ public class Reservation implements Serializable {
      */
     public void setRoomType(RoomType roomType) {
         this.roomType = roomType;
-    }
-
-    /**
-     * @return the roomRate
-     */
-    public RoomRate getRoomRate() {
-        return roomRate;
-    }
-
-    /**
-     * @param roomRate the roomRate to set
-     */
-    public void setRoomRate(RoomRate roomRate) {
-        this.roomRate = roomRate;
     }
 
 }

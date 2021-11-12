@@ -28,7 +28,7 @@ public class RoomType implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long roomTypeId;
     
-    @Column(nullable = false) 
+    @Column(nullable = false, unique = true) 
     @NotNull
     private String name;
     
@@ -227,7 +227,7 @@ public class RoomType implements Serializable {
         this.amenities = amenities;
     }
     
-        /**
+    /**
      * @return the disabled
      */
     public boolean isDisabled() {

@@ -6,6 +6,7 @@
 package entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.Column;
@@ -28,18 +29,28 @@ public class RoomAllocationReport implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long RoomAllocationReportId;
-    
+
     @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false)
     @NotNull
     private Date date;
-    
+
+    @Column(nullable = false)
+    @NotNull
     private List<String> noAvailableRoomUpgrade;
-    
+
+    @Column(nullable = false)
+    @NotNull
     private List<String> noAvailableRoomNoUpgrade;
-    
+
     public RoomAllocationReport() {
-        this.date = new Date();
+    }
+
+    public RoomAllocationReport(Date date) {
+        this();
+        this.date = date;
+        this.noAvailableRoomUpgrade = new ArrayList<>();
+        this.noAvailableRoomNoUpgrade = new ArrayList<>();
     }
 
     public Long getRoomAllocationReportId() {
@@ -74,7 +85,7 @@ public class RoomAllocationReport implements Serializable {
     public String toString() {
         return "entity.RoomAllocationReport[ id=" + RoomAllocationReportId + " ]";
     }
-    
+
     /**
      * @return the date
      */
@@ -116,5 +127,5 @@ public class RoomAllocationReport implements Serializable {
     public void setNoAvailableRoomNoUpgrade(List<String> noAvailableRoomNoUpgrade) {
         this.noAvailableRoomNoUpgrade = noAvailableRoomNoUpgrade;
     }
-    
+
 }

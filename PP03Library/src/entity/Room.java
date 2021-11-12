@@ -52,7 +52,7 @@ public class Room implements Serializable {
     @JoinColumn(nullable = false)
     private RoomType roomType;
 
-    @OneToOne(mappedBy = "room")
+    @OneToOne
     private Reservation currentReservation;
 
     public Room() {

@@ -5,23 +5,27 @@
  */
 package ejb.session.stateful;
 
+import ejb.session.stateless.AllocationSessionBeanLocal;
+import ejb.session.stateless.HandleDateTimeSessionBeanLocal;
 import ejb.session.stateless.ReservationSessionBeanLocal;
 import ejb.session.stateless.RoomTypeSessionBeanLocal;
 import entity.Reservation;
+import entity.Room;
 import entity.RoomRate;
 import entity.RoomType;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.ejb.Stateful;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import util.enumeration.RoomRateTypeEnum;
+import util.enumeration.RoomStatusEnum;
+import util.exception.CheckinGuestException;
+import util.exception.CheckoutGuestException;
 import util.exception.InputDataValidationException;
 import util.exception.ReserveRoomException;
 import util.exception.RoomTypeNotFoundException;
@@ -29,6 +33,12 @@ import util.exception.UnknownPersistenceException;
 
 @Stateful
 public class BookingReservationSessionBean implements BookingReservationSessionBeanRemote, BookingReservationSessionBeanLocal {
+
+    @EJB
+    private AllocationSessionBeanLocal allocationSessionBean;
+
+    @EJB
+    private HandleDateTimeSessionBeanLocal handleDateTimeSessionBean;
 
     @EJB
     private ReservationSessionBeanLocal reservationSessionBean;
@@ -83,37 +93,41 @@ public class BookingReservationSessionBean implements BookingReservationSessionB
     }
 
     public Long doReserveRoom(String roomTypeName, Integer numOfRoomsToReserve, Date checkinDate, Date checkoutDate) throws ReserveRoomException {
-        
+
         try {
             //check with room availabilities to confirm reservation, otherwise throw
-            
+
             Integer rooms = searchRoomResults.get(roomTypeName);
             RoomType roomType = roomTypeSessionBean.retrieveRoomTypeByName(roomTypeName);
-            
+
             if (searchRoomResults.containsKey(roomTypeName) && rooms >= numOfRoomsToReserve) {
                 //Creating Reservation & Associating Room Type
                 Reservation reservation = new Reservation(checkinDate, checkoutDate);
-                
+
                 try {
                     reservation = reservationSessionBean.createReservation(roomType.getRoomTypeId(), reservation);
                 } catch (InputDataValidationException | UnknownPersistenceException ex) {
                     throw new ReserveRoomException(ex.getMessage());
                 }
-                
+
                 //Associating Room Rate
                 for (RoomRate roomRate : roomType.getRoomRates()) {
                     if (roomRate.getRoomRateType().equals(RoomRateTypeEnum.PUBLISHED)) {
                         reservation.setRoomRate(roomRate);
                     }
                 }
-                
+
                 //Allocation Logic if past 2am and checkindate
-                if (isToday(checkinDate) & isPassed2AM()) {
-                    // Call alloacte room logic
+                if (handleDateTimeSessionBean.isToday(checkinDate) & handleDateTimeSessionBean.isPassed2AM()) {
+                    try {
+                        allocationSessionBean.allocateRoom(reservation);
+                    } catch (Exception ex) {
+
+                    }
                 };
-                
+
                 return reservation.getReservationId();
-            
+
             } else {
                 if (!searchRoomResults.containsKey(roomTypeName)) {
                     throw new ReserveRoomException("Invalid Room Type");
@@ -126,48 +140,37 @@ public class BookingReservationSessionBean implements BookingReservationSessionB
         }
 
     }
-    
-    // Check-in Guest? Can this be done in stateless instead?
-    // Handle the exception produced
-    // Print out the associate / room allocated to guest
-    public Room CheckInGuest(Reservation reservation) {
+
+    public Room CheckInGuest(Reservation reservation) throws CheckinGuestException {
 
         Room room = reservation.getRoom();
 
         if (room == null) {
-            //Allocation Logic
-            //No Room No Upgrade Available
+
+            throw new CheckinGuestException("Sorry! The hotel has no rooms of all types for your reservation :( ");
 
         } else {
-            //Room has already been allocated
-            //Inform if upgrade has been made
+
             return room;
         }
     }
 
-    // Check-out Guest? Can this be done in stateless instead?
-    // Must marked reservation as passed
-    // Must unassociate reservation with the room
-    public Room CheckOutGuest(Reservation reservation) {
+    public Room CheckOutGuest(Reservation reservation) throws CheckoutGuestException  {
 
         Room room = reservation.getRoom();
 
         if (room == null) {
-            //Allocation Logic
+            
+            throw new CheckoutGuestException("Cannot find room associated with reservation");
+
         } else {
+
+            room.setCurrentReservation(null);
+            room.setStatus(RoomStatusEnum.AVAILABLE);
+            reservation.setPassed(true);
             return room;
+
         }
-    }
-
-    private boolean isToday(Date date) {
-        LocalDate localDate1 = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-        LocalDate localDate2 = (new Date()).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-        return localDate1.isEqual(localDate2);
-    }
-
-    private boolean isPassed2AM() {
-        LocalTime now = LocalTime.now();
-        return now.getHour() > 2;
     }
 
 //    public List<SearchResult> WalkInSearchRoom(Date checkinDate, Date checkoutDate) {
@@ -196,7 +199,6 @@ public class BookingReservationSessionBean implements BookingReservationSessionB
 //        }
 //        return searchResults;
 //    }
-
     // Walkin reserve room -> same as reserve room on HoRs except one local one remote
 //    public Reservation WalkInReserveRoom(RoomType roomType, Date checkinDate, Date checkoutDate) throws InputDataValidationException, UnknownPersistenceException, RoomTypeNotFoundException {
 //
@@ -218,8 +220,4 @@ public class BookingReservationSessionBean implements BookingReservationSessionB
 //
 //        return reservation;
 //    }
-
-    
-
-
 }

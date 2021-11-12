@@ -17,9 +17,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.DecimalMin;
@@ -68,7 +67,7 @@ public class RoomRate implements Serializable {
     @JoinColumn(nullable = false)
     private RoomType roomType;
 
-    @OneToMany(mappedBy = "roomRate")
+    @ManyToMany
     private List<Reservation> reservations;
 
     public RoomRate() {
