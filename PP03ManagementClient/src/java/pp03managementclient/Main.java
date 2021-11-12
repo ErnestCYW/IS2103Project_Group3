@@ -8,6 +8,8 @@ package pp03managementclient;
 import ejb.session.stateful.BookingReservationSessionBeanRemote;
 import ejb.session.stateless.EmployeeSessionBeanRemote;
 import ejb.session.stateless.PartnerSessionBeanRemote;
+import ejb.session.stateless.RoomRateSessionBeanRemote;
+import ejb.session.stateless.RoomSessionBeanRemote;
 import ejb.session.stateless.RoomTypeSessionBeanRemote;
 import javax.ejb.EJB;
 
@@ -18,11 +20,19 @@ import javax.ejb.EJB;
 public class Main {
 
     @EJB
+    private static RoomRateSessionBeanRemote roomRateSessionBeanRemote;
+
+    @EJB
+    private static RoomSessionBeanRemote roomSessionBeanRemote;
+    
+
+    @EJB
     private static BookingReservationSessionBeanRemote bookingReservationSessionBeanRemote;
 
     @EJB
     private static RoomTypeSessionBeanRemote roomTypeSessionBeanRemote;
 
+    
     @EJB
     private static PartnerSessionBeanRemote partnerSessionBeanRemote;
 
@@ -36,7 +46,7 @@ public class Main {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        MainApp mainApp = new MainApp(employeeSessionBeanRemote, partnerSessionBeanRemote, roomTypeSessionBeanRemote, bookingReservationSessionBeanRemote);
+        MainApp mainApp = new MainApp(employeeSessionBeanRemote, partnerSessionBeanRemote, roomSessionBeanRemote, roomRateSessionBeanRemote, roomTypeSessionBeanRemote, bookingReservationSessionBeanRemote);
         mainApp.runApp();
     }
     
