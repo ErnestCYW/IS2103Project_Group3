@@ -34,7 +34,7 @@ import util.exception.UnknownPersistenceException;
  * @author ernestcyw
  */
 @Stateful
-public class bookingSessionBean implements bookingSessionBeanRemote, bookingSessionBeanLocal {
+public class BookingSessionBean implements bookingSessionBeanRemote, bookingSessionBeanLocal {
 
     @EJB
     private ReservationSessionBeanLocal reservationSessionBean;

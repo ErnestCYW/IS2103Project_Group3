@@ -12,6 +12,7 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import util.enumeration.RoomRateTypeEnum;
 
 /**
  *
@@ -29,6 +30,7 @@ public class AllocationSessionBean implements AllocationSessionBeanRemote, Alloc
     //Allocate Room to Current Day Reservations
     //Ran on timer
     //Calls allocate room 
+    //Create the allocation report for the day
     
     //Allocate Room
     public Room allocateRoom(Reservation reservation) {
@@ -36,20 +38,41 @@ public class AllocationSessionBean implements AllocationSessionBeanRemote, Alloc
         Query availableSameTypeRoomsQuery = em.createQuery("SELECT r FROM rooms r WHERE"
                 + " r.status = util.enumeration.RoomStatusEnum.AVAILABLE AND r.roomType = :inRoomType");
         availableSameTypeRoomsQuery.setParameter("inRoomType", reservation.getRoomType());
-        Room availableRoom = (Room) availableSameTypeRoomsQuery.getSingleResult();
+        Room availableSameTypeRoom = (Room) availableSameTypeRoomsQuery.getSingleResult();
         
-        if (availableRoom != null) {
-            availableRoom.setCurrentReservation(reservation);
-            reservation.setRoom(availableRoom);
+        if (availableSameTypeRoom != null) {
+            availableSameTypeRoom.setCurrentReservation(reservation);
+            reservation.setRoom(availableSameTypeRoom);
             
-            return availableRoom;
+            return availableSameTypeRoom;
         } else {
+            int numberRoomTypes = RoomRateTypeEnum.values().length;
+            int index = RoomRateTypeEnum.valueOf(reservation.getRoomType().toString()).ordinal() + 1;
             
+            while (index < numberRoomTypes) {
+                Query availableDifferentTypeRoomsQuery = em.createQuery("SELECT r FROM rooms r WHERE"
+                + " r.status = util.enumeration.RoomStatusEnum.AVAILABLE AND r.roomType = :inRoomType");
+                availableDifferentTypeRoomsQuery.setParameter("inRoomType", RoomRateTypeEnum.values()[index]);
+                
+                Room availableDifferentTypeRoom = (Room) availableDifferentTypeRoomsQuery.getSingleResult();
+                
+                if (availableDifferentTypeRoom != null) {
+                    availableDifferentTypeRoom.setCurrentReservation(reservation);
+                    reservation.setRoom(availableDifferentTypeRoom);
+                    
+                    //Add to allocation report can assign different room
+                    
+                    return availableDifferentTypeRoom;
+                }
+                
+                index++;
+            }
             
+            //Add to allocation report cannot assign different room
             
+            return null;
         }
     }
-    
     
     //View Room Allocation Report
 
