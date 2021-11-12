@@ -11,11 +11,11 @@ import entity.RoomRate;
 import entity.RoomType;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
@@ -133,6 +133,20 @@ public class RoomTypeSessionBean implements RoomTypeSessionBeanRemote, RoomTypeS
     public List<RoomType> viewAllRoomTypes() {
         Query query = em.createQuery("SELECT rt FROM RoomType rt ORDER BY rt.roomTypeId ASC");
         return query.getResultList();
+    }
+    
+    @Override
+    public RoomType retrieveRoomTypeByName(String roomTypeName) throws RoomTypeNotFoundException {
+        Query query = em.createQuery("SELECT rt FROM RoomType rt WHERE rt.name = :inName");
+        query.setParameter("inName", roomTypeName);
+        try
+        {
+            return (RoomType)query.getSingleResult();
+        }
+        catch(NoResultException | NonUniqueResultException ex)
+        {
+            throw new RoomTypeNotFoundException("Room Type " + roomTypeName + " does not exist!");
+        }
     }
 
     private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<RoomType>> constraintViolations) {

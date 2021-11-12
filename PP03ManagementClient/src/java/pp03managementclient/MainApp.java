@@ -5,12 +5,12 @@
  */
 package pp03managementclient;
 
+import ejb.session.stateful.BookingReservationSessionBeanRemote;
 import ejb.session.stateless.EmployeeSessionBeanRemote;
 import ejb.session.stateless.PartnerSessionBeanRemote;
+import ejb.session.stateless.RoomTypeSessionBeanRemote;
 import entity.Employee;
 import java.util.Scanner;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import util.exception.InvalidEmployeeRoleException;
 import util.exception.InvalidLoginCredentialException;
 
@@ -21,18 +21,26 @@ import util.exception.InvalidLoginCredentialException;
 public class MainApp {
     private EmployeeSessionBeanRemote employeeSessionBeanRemote;
     private PartnerSessionBeanRemote partnerSessionBeanRemote;
+    private RoomTypeSessionBeanRemote roomTypeSessionBeanRemote;
+    private BookingReservationSessionBeanRemote bookingReservationSessionBeanRemote;
 
     private SystemAdministrationModule systemAdministrationModule;
+    private HotelOperationModule hotelOperationModule;
+    private FrontOfficeModule frontOfficeModule;
     
     private Employee loggedInEmployee;
     
     public MainApp() {
     }
 
-    public MainApp(EmployeeSessionBeanRemote employeeSessionBeanRemote, PartnerSessionBeanRemote partnerSessionBeanRemote) {
+    public MainApp(EmployeeSessionBeanRemote employeeSessionBeanRemote, PartnerSessionBeanRemote partnerSessionBeanRemote, RoomTypeSessionBeanRemote roomTypeSessionBeanRemote, BookingReservationSessionBeanRemote bookingReservationSessionBeanRemote) {
         this.employeeSessionBeanRemote = employeeSessionBeanRemote;
         this.partnerSessionBeanRemote = partnerSessionBeanRemote;
+        this.roomTypeSessionBeanRemote = roomTypeSessionBeanRemote;
+        this.bookingReservationSessionBeanRemote = bookingReservationSessionBeanRemote;
     }
+
+    
     
     public void runApp()
     {
@@ -59,6 +67,8 @@ public class MainApp {
                         System.out.println("Login successful!\n");
 
                         systemAdministrationModule = new SystemAdministrationModule(employeeSessionBeanRemote, partnerSessionBeanRemote, loggedInEmployee);
+                        hotelOperationModule = new HotelOperationModule(roomTypeSessionBeanRemote, loggedInEmployee);
+                        frontOfficeModule = new FrontOfficeModule(roomTypeSessionBeanRemote, bookingReservationSessionBeanRemote, loggedInEmployee);
                         menuMain();
                     } 
                     catch (InvalidLoginCredentialException ex) {
@@ -119,7 +129,9 @@ public class MainApp {
             System.out.println("*** HoRS Management System ***\n");
             System.out.println("You are login as " + loggedInEmployee.getFirstName() + " " + loggedInEmployee.getLastName() + "\n");
             System.out.println("1: System Administration");
-            System.out.println("2: Logout\n");
+            System.out.println("2: Hotel Operation");
+            System.out.println("3: Front Office");
+            System.out.println("4: Logout\n");
             response = 0;
             
             while(response < 1 || response > 2)
@@ -141,6 +153,22 @@ public class MainApp {
                 }
                 else if (response == 2)
                 {
+                    try {
+                        hotelOperationModule.menuHotelOperation();
+                    } catch (InvalidEmployeeRoleException ex) {
+                        System.out.println("Invalid option, please try again!: " + ex.getMessage() + "\n");
+                    }
+                }
+                else if (response == 3)
+                {
+                    try {
+                        frontOfficeModule.menuFrontOffice();
+                    } catch (InvalidEmployeeRoleException ex) {
+                        System.out.println("Invalid option, please try again!: " + ex.getMessage() + "\n");
+                    }
+                }
+                else if (response == 4)
+                {
                     break;
                 }
                 else
@@ -149,7 +177,7 @@ public class MainApp {
                 }
             }
             
-            if(response == 2)
+            if(response == 4)
             {
                 break;
             }

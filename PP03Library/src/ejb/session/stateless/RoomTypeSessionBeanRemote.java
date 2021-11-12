@@ -30,4 +30,5 @@ public interface RoomTypeSessionBeanRemote {
 
     public RoomType updateRoomType(RoomType roomTypeEntity) throws RoomTypeNotFoundException, InputDataValidationException;
 
+    public RoomType retrieveRoomTypeByName(String roomTypeName) throws RoomTypeNotFoundException;
 }
