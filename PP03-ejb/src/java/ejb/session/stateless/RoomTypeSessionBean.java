@@ -128,11 +128,18 @@ public class RoomTypeSessionBean implements RoomTypeSessionBeanRemote, RoomTypeS
     }
 
     @Override
-    public void deleteRoomType(Long roomTypeId) throws RoomTypeNotFoundException, RoomRateNotFoundException {
+    public void deleteRoomType(Long roomTypeId) throws RoomTypeNotFoundException {
         RoomType roomTypeEntityToRemove = viewRoomTypeDetails(roomTypeId);
-
+                
         List<Room> rooms = roomTypeEntityToRemove.getRooms();
+        List<RoomRate> roomRates = roomTypeEntityToRemove.getRoomRates();
         List<Reservation> reservations = roomTypeEntityToRemove.getReservations();
+        
+        if(rooms.isEmpty() && roomRates.isEmpty() && reservations.isEmpty()) {
+            em.remove(roomTypeEntityToRemove);
+        } else {
+            roomTypeEntityToRemove.setDisabled(true);
+        }
 
         /**
         if (!(rooms.isEmpty() & reservations.isEmpty())) {
@@ -155,24 +162,24 @@ public class RoomTypeSessionBean implements RoomTypeSessionBeanRemote, RoomTypeS
         **/
         
         //Can refactor with JPQL to lower runtime complexity
-        for (Room room : rooms) {
-            if (!room.isDisabled()) {
-                roomTypeEntityToRemove.setDisabled(true);
-                return;
-            } else {
-                roomTypeEntityToRemove.getRooms().remove(room);
-            }
-        }
-        
-        //Can refactor with JPQL to lower runtime complexity
-        for (Reservation reservation : reservations) {
-            if (reservation.isPassed()) {
-                roomTypeEntityToRemove.getReservations().remove(reservation);
-            } else {
-                roomTypeEntityToRemove.setDisabled(true);
-                return;
-            }
-        }
+//        for (Room room : rooms) {
+//            if (!room.isDisabled()) {
+//                roomTypeEntityToRemove.setDisabled(true);
+//                return;
+//            } else {
+//                roomTypeEntityToRemove.getRooms().remove(room);
+//            }
+//        }
+//        
+//        //Can refactor with JPQL to lower runtime complexity
+//        for (Reservation reservation : reservations) {
+//            if (reservation.isPassed()) {
+//                roomTypeEntityToRemove.getReservations().remove(reservation);
+//            } else {
+//                roomTypeEntityToRemove.setDisabled(true);
+//                return;
+//            }
+//        }
         
         
         

@@ -66,6 +66,11 @@ public class RoomType implements Serializable {
     private List<RoomRate> roomRates;
     
     public RoomType() {
+        this.amenities = new ArrayList<>();
+        this.disabled = false;
+        this.rooms = new ArrayList<>();
+        this.reservations = new ArrayList<>();
+        this.roomRates = new ArrayList<>();
     }
     
     public RoomType(String name, String description, String size, String bed, Integer capacity){
@@ -75,11 +80,6 @@ public class RoomType implements Serializable {
         this.size = size;
         this.bed = bed;
         this.capacity = capacity;
-        this.amenities = new ArrayList<>();
-        this.disabled = false;
-        this.rooms = new ArrayList<>();
-        this.reservations = new ArrayList<>();
-        this.roomRates = new ArrayList<>();
     }
 
     public Long getRoomTypeId() {

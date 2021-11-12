@@ -25,7 +25,7 @@ public interface RoomTypeSessionBeanLocal {
 
     public RoomType viewRoomTypeDetails(Long roomTypeId) throws RoomTypeNotFoundException;
 
-    public void deleteRoomType(Long roomTypeId) throws RoomTypeNotFoundException, RoomRateNotFoundException;
+    public void deleteRoomType(Long roomTypeId) throws RoomTypeNotFoundException;
 
     public List<RoomType> viewAllRoomTypes();
 

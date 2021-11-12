@@ -7,6 +7,7 @@ package entity;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.Column;
@@ -72,6 +73,7 @@ public class RoomRate implements Serializable {
 
     public RoomRate() {
         this.disabled = false;
+        this.reservations = new ArrayList<>();
     }
 
     public RoomRate(String name, RoomRateTypeEnum roomRateType, BigDecimal rate, Date startDate, Date endDate) {

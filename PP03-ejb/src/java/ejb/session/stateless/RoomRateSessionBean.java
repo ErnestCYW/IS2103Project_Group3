@@ -61,6 +61,7 @@ public class RoomRateSessionBean implements RoomRateSessionBeanRemote, RoomRateS
                 roomType.getRoomRates().add(newRoomRateEntity);
                 
                 em.persist(newRoomRateEntity);
+                em.flush();
                 
                 return newRoomRateEntity;
             } catch (PersistenceException ex) {
