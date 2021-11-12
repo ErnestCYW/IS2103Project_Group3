@@ -5,13 +5,13 @@
  */
 package ejb.session.stateful;
 
-import javax.ejb.Local;
+import javax.ejb.Remote;
 
 /**
  *
- * @author ernestcyw
+ * @author elgin
  */
-@Local
-public interface bookingSessionBeanLocal {
+@Remote
+public interface BookingReservationSessionBeanRemote {
     
 }

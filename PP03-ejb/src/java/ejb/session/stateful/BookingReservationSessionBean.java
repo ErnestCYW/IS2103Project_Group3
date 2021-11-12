@@ -31,10 +31,43 @@ import util.exception.UnknownPersistenceException;
 
 /**
  *
+ * @author elgin
+ */
+@Stateful
+public class BookingReservationSessionBean implements BookingReservationSessionBeanRemote, BookingReservationSessionBeanLocal {
+
+    // Add business logic below. (Right-click in editor and choose
+    // "Insert Code > Add Business Method")
+    import ejb.session.stateless.ReservationSessionBeanLocal;
+import ejb.session.stateless.RoomTypeSessionBeanLocal;
+import entity.Reservation;
+import entity.Room;
+import entity.RoomRate;
+import entity.RoomType;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+import javax.ejb.EJB;
+import javax.ejb.Stateful;
+import javax.naming.directory.SearchResult;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+import util.enumeration.RoomRateTypeEnum;
+import util.exception.InputDataValidationException;
+import util.exception.RoomTypeNotFoundException;
+import util.exception.UnknownPersistenceException;
+
+/**
+ *
  * @author ernestcyw
  */
 @Stateful
-public class BookingSessionBean implements bookingSessionBeanRemote, bookingSessionBeanLocal {
+public class BookingSessionBean implements BookingSessionBeanRemote, BookingSessionBeanLocal {
 
     @EJB
     private ReservationSessionBeanLocal reservationSessionBean;
@@ -147,5 +180,7 @@ public class BookingSessionBean implements bookingSessionBeanRemote, bookingSess
     public void persist(Object object) {
         em.persist(object);
     }
+
+}
 
 }
