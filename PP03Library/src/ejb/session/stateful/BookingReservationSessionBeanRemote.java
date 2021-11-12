@@ -5,9 +5,12 @@
  */
 package ejb.session.stateful;
 
+import entity.Room;
 import entity.RoomType;
 import java.util.Date;
+import java.util.List;
 import javax.ejb.Remote;
+import util.exception.CheckinGuestException;
 import util.exception.ReserveRoomException;
 
 /**
@@ -20,4 +23,6 @@ public interface BookingReservationSessionBeanRemote {
     public Double getWalkInPriceForRoomType(RoomType roomType, Date checkinDate, Date checkoutDate);
     public void saveSearchResults(String roomTypeName, Integer numOfAvailablerooms);
     public Long walkInReserveRoom(String roomTypeName, Integer numOfRoomsToReserve, Date checkinDate, Date checkoutDate) throws ReserveRoomException;
+    public List<Room> checkinGuest(Long guestId) throws CheckinGuestException;
+    public void checkoutGuest(Long guestId);
 }

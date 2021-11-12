@@ -9,6 +9,7 @@ import ejb.session.stateless.AllocationSessionBeanLocal;
 import ejb.session.stateless.GuestSessionBeanLocal;
 import ejb.session.stateless.HandleDateTimeSessionBeanLocal;
 import ejb.session.stateless.ReservationSessionBeanLocal;
+import ejb.session.stateless.RoomSessionBeanLocal;
 import ejb.session.stateless.RoomTypeSessionBeanLocal;
 import entity.Guest;
 import entity.Reservation;
@@ -39,6 +40,9 @@ import util.exception.UnknownPersistenceException;
 @Stateful
 public class BookingReservationSessionBean implements BookingReservationSessionBeanRemote, BookingReservationSessionBeanLocal {
 
+    @EJB
+    private RoomSessionBeanLocal roomSessionBeanLocal;
+    
     @EJB
     private GuestSessionBeanLocal guestSessionBeanLocal;
 
@@ -194,11 +198,28 @@ public class BookingReservationSessionBean implements BookingReservationSessionB
     
     
     public Long onlineReserveRoom(String roomTypeName, Integer numOfRoomsToReserve, Date checkinDate, Date checkoutDate, Guest loggedInGuest) throws ReserveRoomException {
-
-    public Room checkinGuest(Long guestId) {
+    }
+    
+    @Override
+    public List<Room> checkinGuest(Long guestId) throws CheckinGuestException {
         
-        Query roomQuery = em.createQuery("SELECT rm FROM Room rm WHERE rm.currentReservation ");
+        List<Room> rooms = roomSessionBeanLocal.viewAllRooms();
+        List<Room> guestRooms = new ArrayList<>();
         
+        for (Room room:rooms)
+        {
+            if(room.getCurrentReservation().getGuest().getGuestId() == guestId)
+            {
+                guestRooms.add(room);
+            }
+        }
+        
+        if(guestRooms.isEmpty())
+        {
+            throw new CheckinGuestException("There are no rooms available for Check-in");
+        }
+        
+        return guestRooms;
     }
     
     /**
@@ -217,22 +238,44 @@ public class BookingReservationSessionBean implements BookingReservationSessionB
     }
     **/
 
-    public Room CheckOutGuest(Reservation reservation) throws CheckoutGuestException  {
+    @Override
+    public void checkoutGuest(Long guestId) {
 
-        Room room = reservation.getRoom();
-
-        if (room == null) {
-            
-            throw new CheckoutGuestException("Cannot find room associated with reservation");
-
-        } else {
-
-            room.setCurrentReservation(null);
-            room.setStatus(RoomStatusEnum.AVAILABLE);
-            reservation.setPassed(true);
-            return room;
-
+        List<Room> rooms = roomSessionBeanLocal.viewAllRooms();
+        
+        for (Room room:rooms)
+        {
+            if(room.getCurrentReservation().getGuest().getGuestId() == guestId)
+            {
+                room.setCurrentReservation(null);
+                room.setStatus(RoomStatusEnum.AVAILABLE);
+                
+                //Disassociating Room Rate and Reservation
+                for(RoomRate roomRate : roomRatesForReservation)
+                {
+                    if(roomRate.getReservations().contains(room.getCurrentReservation()))
+                    {
+                        roomRate.getReservations().remove(room.getCurrentReservation());
+                    }
+                }
+                
+            }
         }
+        
+//        Room room = reservation.getRoom();
+//
+//        if (room == null) {
+//            
+//            throw new CheckoutGuestException("Cannot find room associated with reservation");
+//
+//        } else {
+//
+//            room.setCurrentReservation(null);
+//            room.setStatus(RoomStatusEnum.AVAILABLE);
+//            
+//            return room;
+//
+//        }
     }
 
 //    public List<SearchResult> WalkInSearchRoom(Date checkinDate, Date checkoutDate) {
