@@ -37,6 +37,10 @@ public class RoomAllocationReport implements Serializable {
     private List<String> noAvailableRoomUpgrade;
     
     private List<String> noAvailableRoomNoUpgrade;
+    
+    public RoomAllocationReport() {
+        this.date = new Date();
+    }
 
     public Long getRoomAllocationReportId() {
         return RoomAllocationReportId;
