@@ -141,9 +141,16 @@ public class BookingReservationSessionBean implements BookingReservationSessionB
 
     }
 
-    public Room CheckInGuest(Reservation reservation) throws CheckinGuestException {
+    public Room checkinGuest(Long guestId) {
+        
+        Query roomQuery = em.createQuery("SELECT rm FROM Room rm WHERE rm.currentReservation ");
+        
+    }
+    
+    /**
+    public Room CheckInGuest(Long guestId) throws CheckinGuestException {
 
-        Room room = reservation.getRoom();
+        Room room = reservation
 
         if (room == null) {
 
@@ -154,6 +161,7 @@ public class BookingReservationSessionBean implements BookingReservationSessionB
             return room;
         }
     }
+    **/
 
     public Room CheckOutGuest(Reservation reservation) throws CheckoutGuestException  {
 
