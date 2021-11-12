@@ -116,9 +116,13 @@ public class RoomTypeSessionBean implements RoomTypeSessionBeanRemote, RoomTypeS
             List<RoomRate> roomRates = roomTypeEntityToRemove.getRoomRates();
 
             for (RoomRate roomRate : roomRates) {
-                roomRateSessionBean.deleteRoomRate(roomRate.getRoomRateId());   //Deleting Room Type deletes all its associated room rates that are not in use
-            }                                                                   //RoomRateNotFoundException will never be thrown
-
+                if (roomRate.getReservations().isEmpty()) {
+                    roomRateSessionBean.deleteRoomRate(roomRate.getRoomRateId());
+                } else {
+                    roomTypeEntityToRemove.setDisabled(true);   //Somehow roomRate is in use, should never occur
+                    return;
+                }
+            }                                                                   
             em.remove(roomTypeEntityToRemove);
         } else {
             roomTypeEntityToRemove.setDisabled(true);

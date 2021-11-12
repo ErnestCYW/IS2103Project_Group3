@@ -31,7 +31,7 @@ import util.exception.UnknownPersistenceException;
  */
 @Stateless
 public class RoomRateSessionBean implements RoomRateSessionBeanRemote, RoomRateSessionBeanLocal {
-
+    
     @EJB
     private RoomTypeSessionBeanLocal roomTypeSessionBean;
     
@@ -42,107 +42,109 @@ public class RoomRateSessionBean implements RoomRateSessionBeanRemote, RoomRateS
     // "Insert Code > Add Business Method")
     private final ValidatorFactory validatorFactory;
     private final Validator validator;
-
+    
     public RoomRateSessionBean() {
         validatorFactory = Validation.buildDefaultValidatorFactory();
         validator = validatorFactory.getValidator();
     }
-
+    
     @Override
     public RoomRate createNewRoomRate(Long roomTypeId, RoomRate newRoomRateEntity) throws InputDataValidationException, RoomTypeNotFoundException, UnknownPersistenceException {
-
+        
         Set<ConstraintViolation<RoomRate>> constraintViolations = validator.validate(newRoomRateEntity);
-
+        
         if (constraintViolations.isEmpty()) {
             try {
                 RoomType roomType = roomTypeSessionBean.viewRoomTypeDetails(roomTypeId);
-
+                
+                newRoomRateEntity.setRoomType(roomType);
                 roomType.getRoomRates().add(newRoomRateEntity);
-
+                
                 em.persist(newRoomRateEntity);
-
+                
                 return newRoomRateEntity;
             } catch (PersistenceException ex) {
                 throw new UnknownPersistenceException(ex.getMessage());
             }
-
+            
         } else {
             throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
         }
     }
-
+    
     @Override
     public RoomRate viewRoomRateDetails(Long roomRateId) throws RoomRateNotFoundException {
-
+        
         RoomRate roomRateEntity = em.find(RoomRate.class, roomRateId);
-
+        
         if (roomRateEntity != null) {
             return roomRateEntity;
         } else {
             throw new RoomRateNotFoundException("RoomRate ID " + roomRateId + " does not exists!");
         }
-
+        
     }
-
+    
     @Override
     public RoomRate updateRoomRate(Long roomTypeId, RoomRate roomRateEntity) throws InputDataValidationException, RoomRateNotFoundException, RoomTypeNotFoundException {
         if (roomRateEntity != null && roomRateEntity.getRoomRateId() != null) {
-
+            
             Set<ConstraintViolation<RoomRate>> constraintViolations = validator.validate(roomRateEntity);
-
+            
             if (constraintViolations.isEmpty()) {
-
+                
                 RoomRate roomRateEntityToUpdate = viewRoomRateDetails(roomRateEntity.getRoomRateId());
-
+                
                 roomRateEntityToUpdate.setName(roomRateEntity.getName());
                 roomRateEntityToUpdate.setRoomRateType(roomRateEntity.getRoomRateType());
                 roomRateEntityToUpdate.setRate(roomRateEntity.getRate());
                 roomRateEntityToUpdate.setStartDate(roomRateEntity.getStartDate());
                 roomRateEntityToUpdate.setEndDate(roomRateEntity.getEndDate());
-
+                
                 RoomType roomType = roomTypeSessionBean.viewRoomTypeDetails(roomTypeId);
-
+                
+                roomRateEntityToUpdate.setRoomType(roomType);
                 if (!roomType.getRoomRates().contains(roomRateEntityToUpdate)) {
                     roomType.getRoomRates().add(roomRateEntityToUpdate);
                 }
-
+                
                 return roomRateEntityToUpdate;
             } else {
                 throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
             }
-
+            
         } else {
             throw new RoomRateNotFoundException("RoomRate ID not provided for room rate to be updated");
         }
     }
-
+    
     @Override
     public void deleteRoomRate(Long roomRateId) throws RoomRateNotFoundException {
         RoomRate roomRateEntityToRemove = viewRoomRateDetails(roomRateId);
-
+        
         List<Reservation> reservations = roomRateEntityToRemove.getReservations();
-
+        
         if (reservations.isEmpty()) {               //Check that all reservations using this rate has passed then can delete
             em.remove(roomRateEntityToRemove);
         } else {
             roomRateEntityToRemove.setDisabled(true);
         }
     }
-
+    
     @Override
     public List<RoomRate> viewAllRoomRates() {
         Query query = em.createQuery("SELECT rr FROM RoomRate rr");
         return query.getResultList();
     }
-
+    
     private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<RoomRate>> constraintViolations) {
         String msg = "Input data validation error!:";
-
+        
         for (ConstraintViolation constraintViolation : constraintViolations) {
             msg += "\n\t" + constraintViolation.getPropertyPath() + " - " + constraintViolation.getInvalidValue() + "; " + constraintViolation.getMessage();
         }
-
+        
         return msg;
     }
-
+    
 }
