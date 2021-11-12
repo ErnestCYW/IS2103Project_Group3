@@ -160,7 +160,7 @@ public class FrontOfficeModule {
         Integer numOfRooms = scanner.nextInt();
         
         try {
-            Long bookingId = bookingReservationSessionBeanRemote.doReserveRoom(roomType, numOfRooms, checkinDate, checkoutDate);
+            Long bookingId = bookingReservationSessionBeanRemote.walkInReserveRoom(roomType, numOfRooms, checkinDate, checkoutDate);
             System.out.println("Reservation ID " + bookingId + " successful");
         } catch (ReserveRoomException ex) {
             System.out.println(ex.getMessage());

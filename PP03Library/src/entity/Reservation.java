@@ -55,6 +55,10 @@ public class Reservation implements Serializable {
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private RoomType roomType;
+    
+    @ManyToOne(optional = false)
+    @JoinColumn(nullable = false)
+    private Guest guest;
 
     public Reservation() {
     }
@@ -153,6 +157,20 @@ public class Reservation implements Serializable {
      */
     public void setTotalCost(BigDecimal totalCost) {
         this.totalCost = totalCost;
+    }
+
+    /**
+     * @return the guest
+     */
+    public Guest getGuest() {
+        return guest;
+    }
+
+    /**
+     * @param guest the guest to set
+     */
+    public void setGuest(Guest guest) {
+        this.guest = guest;
     }
 
 }

@@ -57,12 +57,18 @@ public class RoomSessionBean implements RoomSessionBeanRemote, RoomSessionBeanLo
             try {
 
                 RoomType roomType = roomTypeSessionBean.viewRoomTypeDetails(roomTypeId);
-                newRoomEntity.setRoomType(roomType);
-                roomType.getRooms().add(newRoomEntity);
+                
+                if (roomType.isDisabled()) {
+                    //Exception
+                }
+                else {
+                    newRoomEntity.setRoomType(roomType);
+                    roomType.getRooms().add(newRoomEntity);
 
-                em.persist(newRoomEntity);
-                em.flush();
-
+                    em.persist(newRoomEntity);
+                    em.flush();
+                }
+                
                 return newRoomEntity;
             } catch (PersistenceException ex) {
                 throw new UnknownPersistenceException(ex.getMessage());

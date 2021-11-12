@@ -19,5 +19,5 @@ public interface BookingReservationSessionBeanRemote {
     public Integer getNumOfAvailableRoomsForRoomType(Long roomTypeId, Date checkinDate, Date checkoutDate, Integer totalRooms);
     public Double getWalkInPriceForRoomType(RoomType roomType, Date checkinDate, Date checkoutDate);
     public void saveSearchResults(String roomTypeName, Integer numOfAvailablerooms);
-    public Long doReserveRoom(String roomTypeName, Integer numOfRoomsToReserve, Date checkinDate, Date checkoutDate) throws ReserveRoomException;
+    public Long walkInReserveRoom(String roomTypeName, Integer numOfRoomsToReserve, Date checkinDate, Date checkoutDate) throws ReserveRoomException;
 }
