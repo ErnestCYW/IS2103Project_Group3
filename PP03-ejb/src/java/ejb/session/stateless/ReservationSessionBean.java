@@ -94,6 +94,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
 
                 reservationEntityToUpdate.setStartDate(reservationEntity.getStartDate());
                 reservationEntityToUpdate.setEndDate(reservationEntity.getEndDate());
+                reservationEntityToUpdate.setTotalCost(reservationEntity.getTotalCost());
 
                 RoomType roomType = roomTypeSessionBean.viewRoomTypeDetails(roomTypeId);
 
@@ -111,7 +112,9 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
 
     @Override
     public void deleteReservation(Long reservationId) throws ReservationNotFoundException {
+        
         Reservation reservationEntityToRemove = viewReservation(reservationId);
+        reservationEntityToRemove.getRoomType().getReservations().remove(reservationEntityToRemove);
 
         em.remove(reservationEntityToRemove);
         em.flush();

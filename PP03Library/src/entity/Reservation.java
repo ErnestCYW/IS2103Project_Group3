@@ -6,6 +6,7 @@
 package entity;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -16,6 +17,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Digits;
 import javax.validation.constraints.Future;
 import javax.validation.constraints.NotNull;
 
@@ -42,6 +45,12 @@ public class Reservation implements Serializable {
     @NotNull
     @Future
     private Date endDate;
+    
+    @Column(nullable = false, precision = 11, scale = 2)
+    @NotNull
+    @DecimalMin("0.00")
+    @Digits(integer = 9, fraction = 2) // 11 - 2 digits to the left of the decimal point
+    private BigDecimal totalCost;
 
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
@@ -50,10 +59,11 @@ public class Reservation implements Serializable {
     public Reservation() {
     }
 
-    public Reservation(Date startDate, Date endDate) {
+    public Reservation(Date startDate, Date endDate, BigDecimal totalCost) {
         this();
         this.startDate = startDate;
         this.endDate = endDate;
+        this.totalCost = totalCost;
     }
 
     public Long getReservationId() {
@@ -129,6 +139,20 @@ public class Reservation implements Serializable {
      */
     public void setRoomType(RoomType roomType) {
         this.roomType = roomType;
+    }
+
+    /**
+     * @return the totalCost
+     */
+    public BigDecimal getTotalCost() {
+        return totalCost;
+    }
+
+    /**
+     * @param totalCost the totalCost to set
+     */
+    public void setTotalCost(BigDecimal totalCost) {
+        this.totalCost = totalCost;
     }
 
 }

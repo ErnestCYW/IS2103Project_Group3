@@ -113,12 +113,12 @@ public class RoomSessionBean implements RoomSessionBeanRemote, RoomSessionBeanLo
         Room roomEntityToRemove = viewRoom(roomId);
 
         if (roomEntityToRemove.getCurrentReservation() == null) {
-            roomEntityToRemove.setDisabled(true);
-        } else {
             RoomType roomType = roomEntityToRemove.getRoomType();
             roomType.getRooms().remove(roomEntityToRemove);
 
             em.remove(roomEntityToRemove);
+        } else {
+            roomEntityToRemove.setDisabled(true);
         }
     }
 
