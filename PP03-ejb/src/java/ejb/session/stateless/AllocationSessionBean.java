@@ -5,6 +5,8 @@
  */
 package ejb.session.stateless;
 
+import entity.Reservation;
+import entity.Room;
 import javax.ejb.Stateless;
 
 /**
@@ -18,6 +20,18 @@ public class AllocationSessionBean implements AllocationSessionBeanRemote, Alloc
     // "Insert Code > Add Business Method")
     
     //Allocate Room to Current Day Reservations
+    //Ran on timer
+    //Calls allocate room 
+    
+    //Allocate Room
+    public Room allocateRoom(Reservation reservation) {
+        //Check all roooms if available
+        
+        
+        
+        
+    }
+    
     
     //View Room Allocation Report
 }

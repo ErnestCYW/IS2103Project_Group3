@@ -55,19 +55,18 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
         if (constraintViolations.isEmpty()) {
 
             try {
-                
-               RoomType roomType = roomTypeSessionBean.viewRoomTypeDetails(roomTypeId);         //Need to associate roomRate here as well, check startDate endDate 
-               newReservationEntity.setRoomType(roomType);
-               roomType.getReservations().add(newReservationEntity);
-               
-               em.persist(newReservationEntity);
-               em.flush();
-               
-               return newReservationEntity;
+                RoomType roomType = roomTypeSessionBean.viewRoomTypeDetails(roomTypeId);
+                newReservationEntity.setRoomType(roomType);
+                roomType.getReservations().add(newReservationEntity);
+
+                em.persist(newReservationEntity);
+                em.flush();
+
+                return newReservationEntity;
             } catch (PersistenceException ex) {
                 throw new UnknownPersistenceException(ex.getMessage());
             }
-            
+
         } else {
             throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
         }
@@ -76,31 +75,31 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
     @Override
     public Reservation viewReservation(Long reservationId) throws ReservationNotFoundException {
         Reservation reservationEntity = em.find(Reservation.class, reservationId);
-        
+
         if (reservationEntity != null) {
             return reservationEntity;
         } else {
             throw new ReservationNotFoundException("Reservation ID " + reservationId + " does not exists!");
         }
     }
-    
+
     @Override
     public Reservation updateReservation(Long roomTypeId, Reservation reservationEntity) throws ReservationNotFoundException, RoomTypeNotFoundException, InputDataValidationException {
         if (reservationEntity != null && reservationEntity.getReservationId() != null) {
-            
+
             Set<ConstraintViolation<Reservation>> constraintViolations = validator.validate(reservationEntity);
-            
+
             if (constraintViolations.isEmpty()) {
                 Reservation reservationEntityToUpdate = viewReservation(reservationEntity.getReservationId());
-                
+
                 reservationEntityToUpdate.setStartDate(reservationEntity.getStartDate());
                 reservationEntityToUpdate.setEndDate(reservationEntity.getEndDate());
-                
+
                 RoomType roomType = roomTypeSessionBean.viewRoomTypeDetails(roomTypeId);
-                    
+
                 reservationEntityToUpdate.setRoomType(roomType);
                 roomType.getReservations().add(reservationEntity);
-                
+
                 return reservationEntityToUpdate;
             } else {
                 throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
@@ -109,19 +108,19 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
             throw new ReservationNotFoundException("Reservation ID not provided for reservation to be updated");
         }
     }
-    
+
     @Override
     public void deleteReservation(Long reservationId) throws ReservationNotFoundException {
         Reservation reservationEntityToRemove = viewReservation(reservationId);
-        
+
         em.remove(reservationEntityToRemove);
         em.flush();
     }
-    
+
     @Override
     public List<Reservation> viewAllReservations() {
         Query query = em.createQuery("SELECT r FROM Reservation r ORDER BY r.startDate ASC");
-        
+
         return query.getResultList();
     }
 

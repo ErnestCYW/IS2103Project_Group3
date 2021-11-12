@@ -64,9 +64,6 @@ public class RoomRate implements Serializable {
     @NotNull
     private boolean disabled;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(nullable = false)
-    private RoomType roomType;
 
     @OneToMany(mappedBy = "roomRate")
     private List<Reservation> reservations;
@@ -170,20 +167,6 @@ public class RoomRate implements Serializable {
      */
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
-    }
-
-    /**
-     * @return the roomType
-     */
-    public RoomType getRoomType() {
-        return roomType;
-    }
-
-    /**
-     * @param roomType the roomType to set
-     */
-    public void setRoomType(RoomType roomType) {
-        this.roomType = roomType;
     }
 
     /**

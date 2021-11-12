@@ -34,7 +34,7 @@ public class RoomRateSessionBean implements RoomRateSessionBeanRemote, RoomRateS
 
     @EJB
     private RoomTypeSessionBeanLocal roomTypeSessionBean;
-
+    
     @PersistenceContext(unitName = "PP03-ejbPU")
     private EntityManager em;
 
@@ -57,7 +57,6 @@ public class RoomRateSessionBean implements RoomRateSessionBeanRemote, RoomRateS
             try {
                 RoomType roomType = roomTypeSessionBean.viewRoomTypeDetails(roomTypeId);
 
-                newRoomRateEntity.setRoomType(roomType);
                 roomType.getRoomRates().add(newRoomRateEntity);
 
                 em.persist(newRoomRateEntity);
@@ -103,7 +102,6 @@ public class RoomRateSessionBean implements RoomRateSessionBeanRemote, RoomRateS
 
                 RoomType roomType = roomTypeSessionBean.viewRoomTypeDetails(roomTypeId);
 
-                roomRateEntityToUpdate.setRoomType(roomType);
                 if (!roomType.getRoomRates().contains(roomRateEntityToUpdate)) {
                     roomType.getRoomRates().add(roomRateEntityToUpdate);
                 }

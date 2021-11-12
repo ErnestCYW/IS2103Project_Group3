@@ -9,6 +9,7 @@
     <class>entity.RoomType</class>
     <class>entity.Partner</class>
     <class>entity.Guest</class>
+    <class>entity.RoomAllocationReport</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <properties>
       <property name="javax.persistence.schema-generation.database.action" value="create"/>

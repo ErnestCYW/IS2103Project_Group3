@@ -17,6 +17,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.validation.constraints.Future;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -34,11 +35,13 @@ public class Reservation implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false)
     @NotNull
+    @Future
     private Date startDate;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false)
     @NotNull
+    @Future
     private Date endDate;
 
     @Column(nullable = false)
@@ -52,8 +55,7 @@ public class Reservation implements Serializable {
     @JoinColumn(nullable = false)
     private RoomType roomType;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(nullable = false)
+    @ManyToOne
     private RoomRate roomRate;
 
     public Reservation() {
