@@ -37,7 +37,6 @@ import util.exception.CannotGetTodayDateException;
 import util.exception.CannotGetWalkInPriceException;
 import util.exception.CheckinGuestException;
 import util.exception.GuestEmailExistException;
-import util.exception.GuestNotFoundException;
 import util.exception.InputDataValidationException;
 import util.exception.ReserveRoomException;
 import util.exception.RoomTypeNotFoundException;
@@ -207,7 +206,7 @@ public class BookingReservationSessionBean implements BookingReservationSessionB
 
                     Random rand = new Random();
                     Integer int_random = rand.nextInt(9999999);
-                    Guest walkInGuest = new Guest(int_random.toString(),"password");
+                    Guest walkInGuest = new Guest(int_random.toString(), "password");
                     Long guestId = guestSessionBeanLocal.createNewGuest(walkInGuest);
 
                     for (int roomCount = 0; roomCount < numOfRoomsToReserve; roomCount++) {
@@ -360,10 +359,10 @@ public class BookingReservationSessionBean implements BookingReservationSessionB
         List<Room> guestRooms = new ArrayList<>();
 
         for (Room room : rooms) {
-            if (room.getCurrentReservation() == null) {
+            if (room.getCurrentReservation() != null){
                 continue;
-            } else if (room.getCurrentReservation().getGuest().getGuestId() == guestId) {
-                guestRooms.add(room);
+            } else if (Objects.equals(room.getCurrentReservation().getGuest().getGuestId(), guestId)) {
+                    guestRooms.add(room);
             }
         }
 
@@ -380,9 +379,9 @@ public class BookingReservationSessionBean implements BookingReservationSessionB
         List<Room> rooms = roomSessionBeanLocal.viewAllRooms();
 
         for (Room room : rooms) {
-            if (room.getCurrentReservation() == null) {
+            if (room.getCurrentReservation() == null){
                 continue;
-            } if (room.getCurrentReservation().getGuest().getGuestId() == guestId) {
+            } if (Objects.equals(room.getCurrentReservation().getGuest().getGuestId(), guestId)) {
                 room.setCurrentReservation(null);
                 room.setStatus(RoomStatusEnum.AVAILABLE);
 
