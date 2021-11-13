@@ -5,9 +5,11 @@
  */
 package ejb.session.stateless;
 
-import entity.Employee;
+import entity.Guest;
 import entity.Partner;
+import entity.Reservation;
 import java.util.List;
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -15,10 +17,10 @@ import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
-import util.exception.EmployeeNotFoundException;
 import util.exception.InvalidLoginCredentialException;
 import util.exception.PartnerNotFoundException;
 import util.exception.PartnerUsernameExistException;
+import util.exception.ReservationNotFoundException;
 import util.exception.UnknownPersistenceException;
 
 /**
@@ -28,8 +30,13 @@ import util.exception.UnknownPersistenceException;
 @Stateless
 public class PartnerSessionBean implements PartnerSessionBeanRemote, PartnerSessionBeanLocal {
 
+    @EJB(name = "ReservationSessionBeanLocal")
+    private ReservationSessionBeanLocal reservationSessionBeanLocal;
+
     @PersistenceContext(unitName = "PP03-ejbPU")
     private EntityManager em;
+    
+    
 
     @Override
     public Long createNewPartner(Partner newPartner) throws PartnerUsernameExistException, UnknownPersistenceException
@@ -125,5 +132,28 @@ public class PartnerSessionBean implements PartnerSessionBeanRemote, PartnerSess
         {
             throw new InvalidLoginCredentialException("Username does not exist or invalid password!");
         }
+    }
+    
+    
+    @Override
+    public Reservation viewPartnerReservation(long reservationId, Partner partner) throws ReservationNotFoundException, InvalidLoginCredentialException {
+        
+        Reservation reservation = reservationSessionBeanLocal.viewReservation(reservationId);
+        
+        if (reservation.getPartner().equals(partner)) {
+            return reservation;
+        } else {
+            throw new InvalidLoginCredentialException("Reservation does not exist or does not belong to you");
+        }
+        
+    }
+    
+   
+    
+    @Override
+    public List<Reservation> viewReservations(Partner partner) {
+        
+        return partner.getReservations();
+    
     }
 }
