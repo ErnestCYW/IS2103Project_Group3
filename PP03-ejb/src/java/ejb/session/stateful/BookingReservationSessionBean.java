@@ -176,7 +176,8 @@ public class BookingReservationSessionBean implements BookingReservationSessionB
                     + "ORDER BY rr.roomRateType DESC"); //Need to test if really sort by enum field priority (natural ordering vs. string)
             query.setParameter("inRoomType", roomType);
             query.setParameter("inDateStayed", dateStayed);
-            RoomRate roomRate = (RoomRate) query.getSingleResult();
+            List<RoomRate> temp = query.setMaxResults(1).getResultList();
+            RoomRate roomRate = temp.get(0);
 
             if (roomRate != null) {
 
@@ -307,6 +308,9 @@ public class BookingReservationSessionBean implements BookingReservationSessionB
                     for (int roomCount = 0; roomCount < numOfRoomsToReserve; roomCount++) {
 
                         Reservation reservation = new Reservation(checkinDate, checkoutDate, totalPrice);
+                        loggedInGuest.getReservations().size();
+                        reservation.setGuest(loggedInGuest);
+                        loggedInGuest.getReservations().add(reservation);
 
                         reservation = reservationSessionBean.createReservation(roomType.getRoomTypeId(), reservation);
 
@@ -375,10 +379,10 @@ public class BookingReservationSessionBean implements BookingReservationSessionB
         List<Room> guestRooms = new ArrayList<>();
 
         for (Room room : rooms) {
-            if (room.getCurrentReservation() != null){
+            if (room.getCurrentReservation() != null) {
                 continue;
             } else if (Objects.equals(room.getCurrentReservation().getGuest().getGuestId(), guestId)) {
-                    guestRooms.add(room);
+                guestRooms.add(room);
             }
         }
 
@@ -395,9 +399,10 @@ public class BookingReservationSessionBean implements BookingReservationSessionB
         List<Room> rooms = roomSessionBeanLocal.viewAllRooms();
 
         for (Room room : rooms) {
-            if (room.getCurrentReservation() == null){
+            if (room.getCurrentReservation() == null) {
                 continue;
-            } if (Objects.equals(room.getCurrentReservation().getGuest().getGuestId(), guestId)) {
+            }
+            if (Objects.equals(room.getCurrentReservation().getGuest().getGuestId(), guestId)) {
                 room.setCurrentReservation(null);
                 room.setStatus(RoomStatusEnum.AVAILABLE);
 

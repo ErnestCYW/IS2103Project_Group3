@@ -117,7 +117,9 @@ public class MainApp {
         
         if(username.length() > 0 && password.length() > 0)
         {
-            this.loggedInGuest = guestSessionBeanRemote.guestLogin(username, password);
+            Guest guest = guestSessionBeanRemote.guestLogin(username, password);
+            //guest.getReservations().size();
+            this.loggedInGuest = guest;
         }
         else 
         {
@@ -242,7 +244,7 @@ public class MainApp {
     private void doReserveHotelRoom(Date checkinDate, Date checkoutDate) {
         Scanner scanner = new Scanner(System.in);
 
-        System.out.print("Enter ReservationId> "); //Only from search results
+        System.out.print("Enter Room Type Name> "); //Only from search results
         String roomType = scanner.nextLine().trim();
         System.out.print("Enter number of rooms> ");
         Integer numOfRooms = scanner.nextInt();

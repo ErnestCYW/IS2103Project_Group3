@@ -104,7 +104,9 @@ public class GuestSessionBean implements GuestSessionBeanRemote, GuestSessionBea
         
         try
         {
-            return (Guest)query.getSingleResult();
+            Guest guest = (Guest)query.getSingleResult();
+            guest.getReservations().size();
+            return guest;
         }
         catch(NoResultException | NonUniqueResultException ex)
         {
@@ -121,9 +123,11 @@ public class GuestSessionBean implements GuestSessionBeanRemote, GuestSessionBea
         try
         {
             Guest guest = retrieveGuestByEmail(email);
+            //guest.getReservations().size();
             
             if(guest.getPassword().equals(password))
             {
+                //guest.getReservations().size();
                 return guest;
             }
             else
