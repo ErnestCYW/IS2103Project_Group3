@@ -21,7 +21,6 @@ import javax.ejb.LocalBean;
 import javax.ejb.Startup;
 import util.enumeration.EmployeeRoleEnum;
 import util.enumeration.RoomRateTypeEnum;
-
 import util.exception.EmployeeNotFoundException;
 import util.exception.EmployeeUsernameExistException;
 import util.exception.InputDataValidationException;

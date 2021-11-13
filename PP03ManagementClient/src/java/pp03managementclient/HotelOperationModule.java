@@ -17,6 +17,7 @@ import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
@@ -482,17 +483,24 @@ public class HotelOperationModule {
 
         try {
             RoomRate roomRate = roomRateSessionBeanRemote.viewRoomRateDetails(roomRateId);
-            if (roomRate.getStartDate() == null && roomRate.getEndDate() == null) {
-                System.out.printf("%8s%20s%20s%15s%20s%20s\n", "Room Rate ID", "Name", "Room Type", "Room Rate Type", "Rate", "Disabled");
-                System.out.printf("%8s%20s%20s%15s%20s%20s\n", roomRate.getRoomRateId(), roomRate.getName(), roomRate.getRoomType().getName(), roomRate.getRoomRateType().toString(), NumberFormat.getCurrencyInstance().format(roomRate.getRate()), printDisabled(roomRate.isDisabled()));
-            } else {
-                System.out.printf("%8s%20s%20s%15s%20s%10s%5s%5s\n", "Room Rate ID", "Name", "Room Type", "Room Rate Type", "Start Date", "End Date", "Rate", "Disabled");
-                SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-                String startDateStr = formatter.format(roomRate.getStartDate());
-                String endDateStr = formatter.format(roomRate.getEndDate());
+//            if (roomRate.getStartDate() == null && roomRate.getEndDate() == null) {
+//                System.out.printf("%8s%20s%20s%15s%20s%20s\n", "Room Rate ID", "Name", "Room Type", "Room Rate Type", "Rate", "Disabled");
+//                System.out.printf("%8s%20s%20s%15s%20s%20s\n", roomRate.getRoomRateId(), roomRate.getName(), roomRate.getRoomType().getName(), roomRate.getRoomRateType().toString(), NumberFormat.getCurrencyInstance().format(roomRate.getRate()), printDisabled(roomRate.isDisabled()));
+//            } else {
+//                System.out.printf("%8s%20s%20s%15s%20s%10s%5s%5s\n", "Room Rate ID", "Name", "Room Type", "Room Rate Type", "Start Date", "End Date", "Rate", "Disabled");
+//                SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+//                String startDateStr = formatter.format(roomRate.getStartDate());
+//                String endDateStr = formatter.format(roomRate.getEndDate());
+//
+//                System.out.printf("%8s%20s%20s%15s%20s%10s%5s%5s\n", roomRate.getRoomRateId(), roomRate.getName(), roomRate.getRoomType().getName(), roomRate.getRoomRateType().toString(), startDateStr, endDateStr, NumberFormat.getCurrencyInstance().format(roomRate.getRate()), printDisabled(roomRate.isDisabled()));
+//            }
 
-                System.out.printf("%8s%20s%20s%15s%20s%10s%5s%5s\n", roomRate.getRoomRateId(), roomRate.getName(), roomRate.getRoomType().getName(), roomRate.getRoomRateType().toString(), startDateStr, endDateStr, NumberFormat.getCurrencyInstance().format(roomRate.getRate()), printDisabled(roomRate.isDisabled()));
-            }
+            System.out.printf("%8s%20s%20s%15s%20s%10s%5s%5s\n", "Room Rate ID", "Name", "Room Type", "Room Rate Type", "Start Date", "End Date", "Rate", "Disabled");
+            SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+            String startDateStr = formatter.format(roomRate.getStartDate());
+            String endDateStr = formatter.format(roomRate.getEndDate());
+
+            System.out.printf("%8s%20s%20s%15s%20s%10s%5s%5s\n", roomRate.getRoomRateId(), roomRate.getName(), roomRate.getRoomType().getName(), roomRate.getRoomRateType().toString(), startDateStr, endDateStr, NumberFormat.getCurrencyInstance().format(roomRate.getRate()), printDisabled(roomRate.isDisabled()));
 
             System.out.println("------------------------");
             System.out.println("1: Update Room Rate");
@@ -547,8 +555,8 @@ public class HotelOperationModule {
                     }
 
                 } else {
-                    roomRate.setStartDate(null);
-                    roomRate.setEndDate(null);
+                    roomRate.setStartDate(new Date());
+                    roomRate.setEndDate(new Date(Long.MAX_VALUE));
                 }
 
                 break;
@@ -623,20 +631,12 @@ public class HotelOperationModule {
         System.out.printf("%8s%20s%20s%15s%20s%10s%5s%5s\n", "Room Rate ID", "Name", "Room Type", "Room Rate Type", "Start Date", "End Date", "Rate", "Disabled");
 
         for (RoomRate roomRate : roomRates) {
-            String startDateStr;
-            String endDateStr;
 
             SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-            if (roomRate.getStartDate() == null) {
-                startDateStr = "";
-            } else {
-                startDateStr = formatter.format(roomRate.getStartDate());
-            }
-            if (roomRate.getEndDate() == null) {
-                endDateStr = "";
-            } else {
-                endDateStr = formatter.format(roomRate.getEndDate());
-            }
+
+            String startDateStr = formatter.format(roomRate.getStartDate());
+
+            String endDateStr = formatter.format(roomRate.getEndDate());
 
             System.out.printf("%8s%20s%20s%15s%20s%10s%5s%5s\n", roomRate.getRoomRateId(), roomRate.getName(), roomRate.getRoomType().getName(), roomRate.getRoomRateType().toString(), startDateStr, endDateStr, NumberFormat.getCurrencyInstance().format(roomRate.getRate()), printDisabled(roomRate.isDisabled()));
 
