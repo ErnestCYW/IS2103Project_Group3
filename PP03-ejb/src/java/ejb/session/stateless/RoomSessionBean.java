@@ -12,6 +12,8 @@ import java.util.Set;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
@@ -133,6 +135,17 @@ public class RoomSessionBean implements RoomSessionBeanRemote, RoomSessionBeanLo
         Query query = em.createQuery("SELECT r FROM Room r ORDER BY r.roomId ASC");
 
         return query.getResultList();
+    }
+    
+    @Override
+    public Room retrieveRoomByRoomNumber(String roomNum) throws RoomNotFoundException {
+        Query query = em.createQuery("SELECT r FROM Room r WHERE r.number = :inRoomNum");
+        query.setParameter("inRoomNum", roomNum);
+        try {
+            return (Room) query.getSingleResult();
+        } catch (NoResultException | NonUniqueResultException ex) {
+            throw new RoomNotFoundException("Room " + roomNum + " does not exist!");
+        }
     }
 
     private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<Room>> constraintViolations) {

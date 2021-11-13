@@ -28,4 +28,5 @@ public interface RoomSessionBeanRemote {
 
     public List<Room> viewAllRooms();
 
+    public Room retrieveRoomByRoomNumber(String roomNum) throws RoomNotFoundException;
 }

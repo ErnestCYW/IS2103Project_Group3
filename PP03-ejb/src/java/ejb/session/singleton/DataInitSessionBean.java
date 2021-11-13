@@ -35,7 +35,7 @@ public class DataInitSessionBean {
     public void postConstruct() {
         try
         {
-            employeeSessionBeanLocal.retrieveEmployeeByUsername("master");
+            employeeSessionBeanLocal.retrieveEmployeeByUsername("sysadmin");
         }
         catch(EmployeeNotFoundException ex)
         {
@@ -46,7 +46,7 @@ public class DataInitSessionBean {
     private void initializeData() {
         try 
         {
-            employeeSessionBeanLocal.createNewEmployee(new Employee("Default", "Admin", "master", "password", EmployeeRoleEnum.SYSTEM_ADMIN));
+            employeeSessionBeanLocal.createNewEmployee(new Employee("Default", "Admin", "sysadmin", "password", EmployeeRoleEnum.SYSTEM_ADMIN));
         } 
         catch (EmployeeUsernameExistException | UnknownPersistenceException ex) 
         {

@@ -7,6 +7,7 @@ package pp03managementclient;
 
 import ejb.session.stateful.BookingReservationSessionBeanRemote;
 import ejb.session.stateless.EmployeeSessionBeanRemote;
+import ejb.session.stateless.HandleDateTimeSessionBeanRemote;
 import ejb.session.stateless.PartnerSessionBeanRemote;
 import ejb.session.stateless.RoomRateSessionBeanRemote;
 import ejb.session.stateless.RoomSessionBeanRemote;
@@ -27,6 +28,7 @@ public class MainApp {
     private RoomRateSessionBeanRemote roomRateSessionBeanRemote;
     private RoomTypeSessionBeanRemote roomTypeSessionBeanRemote;
     private BookingReservationSessionBeanRemote bookingReservationSessionBeanRemote;
+    private HandleDateTimeSessionBeanRemote handleDateTimeSessionBeanRemote;
 
     private SystemAdministrationModule systemAdministrationModule;
     private HotelOperationModule hotelOperationModule;
@@ -37,14 +39,17 @@ public class MainApp {
     public MainApp() {
     }
 
-    public MainApp(EmployeeSessionBeanRemote employeeSessionBeanRemote, PartnerSessionBeanRemote partnerSessionBeanRemote, RoomSessionBeanRemote roomSessionBeanRemote, RoomRateSessionBeanRemote roomRateSessionBeanRemote, RoomTypeSessionBeanRemote roomTypeSessionBeanRemote, BookingReservationSessionBeanRemote bookingReservationSessionBeanRemote) {
+    public MainApp(EmployeeSessionBeanRemote employeeSessionBeanRemote, PartnerSessionBeanRemote partnerSessionBeanRemote, RoomSessionBeanRemote roomSessionBeanRemote, RoomRateSessionBeanRemote roomRateSessionBeanRemote, RoomTypeSessionBeanRemote roomTypeSessionBeanRemote, BookingReservationSessionBeanRemote bookingReservationSessionBeanRemote, HandleDateTimeSessionBeanRemote handleDateTimeSessionBeanRemote) {
         this.employeeSessionBeanRemote = employeeSessionBeanRemote;
         this.partnerSessionBeanRemote = partnerSessionBeanRemote;
         this.roomSessionBeanRemote = roomSessionBeanRemote;
         this.roomRateSessionBeanRemote = roomRateSessionBeanRemote;
         this.roomTypeSessionBeanRemote = roomTypeSessionBeanRemote;
         this.bookingReservationSessionBeanRemote = bookingReservationSessionBeanRemote;
+        this.handleDateTimeSessionBeanRemote = handleDateTimeSessionBeanRemote;
     }
+
+    
 
     
 
@@ -75,7 +80,7 @@ public class MainApp {
                         System.out.println("Login successful!\n");
 
                         systemAdministrationModule = new SystemAdministrationModule(employeeSessionBeanRemote, partnerSessionBeanRemote, loggedInEmployee);
-                        hotelOperationModule = new HotelOperationModule(roomSessionBeanRemote, roomRateSessionBeanRemote, roomTypeSessionBeanRemote, loggedInEmployee);
+                        hotelOperationModule = new HotelOperationModule(roomSessionBeanRemote, roomRateSessionBeanRemote, roomTypeSessionBeanRemote, handleDateTimeSessionBeanRemote, loggedInEmployee);
                         frontOfficeModule = new FrontOfficeModule(roomTypeSessionBeanRemote, bookingReservationSessionBeanRemote, loggedInEmployee);
                         menuMain();
                     } 

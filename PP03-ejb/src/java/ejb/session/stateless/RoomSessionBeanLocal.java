@@ -27,5 +27,7 @@ public interface RoomSessionBeanLocal {
     public void deleteRoom(Long roomId) throws RoomNotFoundException;
 
     public List<Room> viewAllRooms();
+
+    public Room retrieveRoomByRoomNumber(String roomNum) throws RoomNotFoundException;
     
 }
