@@ -10,8 +10,10 @@ import entity.RoomType;
 import java.util.Date;
 import java.util.List;
 import javax.ejb.Remote;
+import util.exception.CannotGetWalkInPriceException;
 import util.exception.CheckinGuestException;
 import util.exception.ReserveRoomException;
+import util.exception.RoomTypeNotFoundException;
 
 /**
  *
@@ -19,10 +21,17 @@ import util.exception.ReserveRoomException;
  */
 @Remote
 public interface BookingReservationSessionBeanRemote {
-    public Integer getNumOfAvailableRoomsForRoomType(Long roomTypeId, Date checkinDate, Date checkoutDate, Integer totalRooms);
-    public Double getWalkInPriceForRoomType(RoomType roomType, Date checkinDate, Date checkoutDate);
+    
+    public Integer getNumOfAvailableRoomsForRoomType(Long roomTypeId, Date checkinDate, Date checkoutDate) throws RoomTypeNotFoundException;
+    
+    public Double getWalkInPriceForRoomType(RoomType roomType, Date checkinDate, Date checkoutDate)throws CannotGetWalkInPriceException;
+    
     public void saveSearchResults(String roomTypeName, Integer numOfAvailablerooms);
-    public Long walkInReserveRoom(String roomTypeName, Integer numOfRoomsToReserve, Date checkinDate, Date checkoutDate) throws ReserveRoomException;
+    
+    public List<Long> walkInReserveRoom(String roomTypeName, Integer numOfRoomsToReserve, Date checkinDate, Date checkoutDate) throws ReserveRoomException;
+    
     public List<Room> checkinGuest(Long guestId) throws CheckinGuestException;
+    
     public void checkoutGuest(Long guestId);
+
 }

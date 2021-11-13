@@ -10,7 +10,11 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.List;
 import javax.ejb.Stateless;
 import util.exception.CannotGetTodayDateException;
 
@@ -20,7 +24,7 @@ import util.exception.CannotGetTodayDateException;
  */
 @Stateless
 public class HandleDateTimeSessionBean implements HandleDateTimeSessionBeanLocal, HandleDateTimeSessionBeanRemote {
-    
+
     @Override
     public Date getTodayDate() throws CannotGetTodayDateException {
         try {
@@ -44,11 +48,27 @@ public class HandleDateTimeSessionBean implements HandleDateTimeSessionBeanLocal
         LocalTime now = LocalTime.now();
         return now.getHour() > 2;
     }
-    
-    public Date convertStringInputToDate(String stringInput) throws ParseException{
+
+    @Override
+    public Date convertStringInputToDate(String stringInput) throws ParseException {
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
         Date toReturn = formatter.parse(stringInput);
         return toReturn;
+    }
+
+    @Override
+    public List<Date> retrieveDatesBetween(Date startDate, Date endDate) {
+        List<Date> dates = new ArrayList<>();
+        Calendar calendar = new GregorianCalendar();
+        calendar.setTime(startDate);
+
+        while (calendar.getTime().before(endDate)) {
+            Date result = calendar.getTime();
+            dates.add(result);
+            calendar.add(Calendar.DATE, 1);
+        }
+        return dates;
+
     }
 
 }

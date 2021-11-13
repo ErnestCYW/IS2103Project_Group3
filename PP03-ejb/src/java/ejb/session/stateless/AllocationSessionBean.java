@@ -111,6 +111,7 @@ public class AllocationSessionBean implements AllocationSessionBeanRemote, Alloc
                     } catch (RoomTypeNotFoundException ex) {
                         
                         break;
+                    
                     }
 
                 }

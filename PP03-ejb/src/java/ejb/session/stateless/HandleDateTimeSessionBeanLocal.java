@@ -7,6 +7,7 @@ package ejb.session.stateless;
 
 import java.text.ParseException;
 import java.util.Date;
+import java.util.List;
 import javax.ejb.Local;
 import util.exception.CannotGetTodayDateException;
 
@@ -24,5 +25,7 @@ public interface HandleDateTimeSessionBeanLocal {
     public boolean isPassed2AM();
 
     public Date convertStringInputToDate(String stringInput) throws ParseException;
+
+    public List<Date> retrieveDatesBetween(Date startDate, Date endDate);
     
 }

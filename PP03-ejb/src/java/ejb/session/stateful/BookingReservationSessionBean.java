@@ -21,16 +21,16 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import javax.ejb.EJB;
 import javax.ejb.Stateful;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
-import util.enumeration.RoomRateTypeEnum;
 import util.enumeration.RoomStatusEnum;
+import util.exception.CannotGetOnlinePriceException;
+import util.exception.CannotGetTodayDateException;
+import util.exception.CannotGetWalkInPriceException;
 import util.exception.CheckinGuestException;
-import util.exception.CheckoutGuestException;
 import util.exception.GuestEmailExistException;
 import util.exception.InputDataValidationException;
 import util.exception.ReserveRoomException;
@@ -61,144 +61,205 @@ public class BookingReservationSessionBean implements BookingReservationSessionB
     @PersistenceContext(unitName = "PP03-ejbPU")
     private EntityManager em;
 
+    //Contains RoomType Name & Number of Available Rooms For That Type
     private HashMap<String, Integer> searchRoomResults;
+    //Contains All RoomRates Used For That Reservation Based On Period
     private List<RoomRate> roomRatesForReservation;
-    private HashMap<String, BigDecimal> roomTypeReservationAmount;
+    //Contains The Room Type And Total Price For A Reservation
+    private HashMap<String, BigDecimal> roomTypeNameAndTotalPrice;
 
     public BookingReservationSessionBean() {
         searchRoomResults = new HashMap<>();
         roomRatesForReservation = new ArrayList<>();
-        roomTypeReservationAmount = new HashMap<>();
+        roomTypeNameAndTotalPrice = new HashMap<>();
     }
 
     @Override
-    public Integer getNumOfAvailableRoomsForRoomType(Long roomTypeId, Date checkinDate, Date checkoutDate, Integer totalRooms) { //Total Rooms of that Room Type
-        Query numberReservationsQuery = em.createQuery("SELECT r FROM Reservation r WHERE"
-                + " AND (r.startDate BETWEEN :checkinDate AND :checkoutDate)"
-                + " OR (r.endDate BETWEEN :checkinDate AND :checkoutDate)");
-        numberReservationsQuery.setParameter("checkinDate", checkinDate);
-        numberReservationsQuery.setParameter("checkoutDate", checkoutDate);
+    public Integer getNumOfAvailableRoomsForRoomType(Long roomTypeId, Date checkinDate, Date checkoutDate) throws RoomTypeNotFoundException {
 
-        List<Reservation> reservations = numberReservationsQuery.getResultList();
-        Integer numOfRoomsReserved = 0;
+        RoomType roomType = roomTypeSessionBean.viewRoomTypeDetails(roomTypeId);
 
-        for (Reservation reservation : reservations) {
-            if (reservation.getRoomType().getRoomTypeId() == roomTypeId) {
-                numOfRoomsReserved++;
-            }
-        }
+        Query countRoomsForTypeQuery = em.createQuery("SELECT COUNT(r) FROM Room r "
+                + "WHERE r.roomType = :inRoomType");
+        countRoomsForTypeQuery.setParameter("inRoomType", roomType);
+        Integer numRoomsForType = (Integer) countRoomsForTypeQuery.getSingleResult();
 
-        return totalRooms - numOfRoomsReserved;
+        Query countReservationsForTypeQuery = em.createQuery("SELECT COUNT(r) FROM Reservation r "
+                + "WHERE ((r.startDate BETWEEN :checkinDate AND :inCheckoutDate) "
+                + "OR (r.endDate BETWEEN :checkinDate AND :inCheckoutDate))"
+                + "AND r.roomType = :inRoomType");
+        countReservationsForTypeQuery.setParameter("inCheckinDate", checkinDate);
+        countReservationsForTypeQuery.setParameter("inCheckoutDate", checkoutDate);
+        countReservationsForTypeQuery.setParameter("inRoomType", roomType);
+        Integer numReservationsForType = (Integer) countReservationsForTypeQuery.getSingleResult();
 
-    }
-
-    public void saveSearchResults(String roomTypeName, Integer numOfAvailablerooms) {
-        searchRoomResults.put(roomTypeName, numOfAvailablerooms);
+        return numRoomsForType - numReservationsForType;
     }
 
     @Override
-    public Double getWalkInPriceForRoomType(RoomType roomType, Date checkinDate, Date checkoutDate) {
+    public Double getWalkInPriceForRoomType(RoomType roomType, Date checkinDate, Date checkoutDate) throws CannotGetWalkInPriceException {
+
         Double totalPrice = 0.0;
-        for (RoomRate roomRate : roomType.getRoomRates()) {
-            if (roomRate.getRoomRateType().equals(RoomRateTypeEnum.PUBLISHED)) {
-                
-                //save the room rate used for this reservation
-                roomRatesForReservation.add(roomRate);
-                
-                long diff = checkoutDate.getTime() - checkinDate.getTime();
-                totalPrice = TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS) * roomRate.getRate().doubleValue();
-            }
-        }
-        
-        roomTypeReservationAmount.put(roomType.getName(), BigDecimal.valueOf(totalPrice));
-        return totalPrice;
-    }
-    
-    public Double getOnlinePriceForRoomType(RoomType roomType, Date checkinDate, Date checkoutDate) {
-        Double totalPrice = 0.0;
-        for (RoomRate roomRate : roomType.getRoomRates()) {
-            if (roomRate.getRoomRateType().equals(RoomRateTypeEnum.PUBLISHED)) {
-                
-                //save the room rate used for this reservation
-                roomRatesForReservation.add(roomRate);
-                
-                long diff = checkoutDate.getTime() - checkinDate.getTime();
-                totalPrice = TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS) * roomRate.getRate().doubleValue();
-            }
-        }
-        
-        roomTypeReservationAmount.put(roomType.getName(), BigDecimal.valueOf(totalPrice));
-        return totalPrice;
-    }
 
-    @Override
-    public Long walkInReserveRoom(String roomTypeName, Integer numOfRoomsToReserve, Date checkinDate, Date checkoutDate) throws ReserveRoomException {
+        List<Date> datesStayed = handleDateTimeSessionBean.retrieveDatesBetween(checkinDate, checkoutDate);
 
-        try {
-            //check with room availabilities to confirm reservation, otherwise throw
+        for (Date dateStayed : datesStayed) {
 
-            Integer rooms = searchRoomResults.get(roomTypeName);
-            BigDecimal reservationAmount = roomTypeReservationAmount.get(roomTypeName);
-            RoomType roomType = roomTypeSessionBean.retrieveRoomTypeByName(roomTypeName);
-            
-            //cannot reserve if room rate is disabled
-            for(RoomRate roomRate : roomRatesForReservation) {
-                if (roomRate.isDisabled()) {
-                    //EXCEPTION
-                }
-            }
+            Query walkInRatesQuery = em.createQuery("SELECT rr FROM RoomRate rr "
+                    + "WHERE rr.roomType = :inRoomType "
+                    + "AND (:inDateStayed BETWEEN rr.startDate AND rr.endDate) "
+                    + "AND NOT rr.disabled "
+                    + "AND rr.roomRateType = util.enumeration.RoomRateTypeEnum.PUBLISHED");
+            walkInRatesQuery.setParameter("inRoomType", roomType);
+            walkInRatesQuery.setParameter(":inDateStayed", dateStayed);
+            RoomRate walkInRate = (RoomRate) walkInRatesQuery.getSingleResult();
 
-            if (searchRoomResults.containsKey(roomTypeName) && rooms >= numOfRoomsToReserve) {
-                //Creating Reservation & Associating Room Type
-                Reservation reservation = new Reservation(checkinDate, checkoutDate, reservationAmount);
+            if (walkInRate != null) {
 
-                try {
-                    reservation = reservationSessionBean.createReservation(roomType.getRoomTypeId(), reservation);
-                    
-                    //Associating Room Rate and Reservation
-                    for (RoomRate roomRate : roomRatesForReservation) {
-                        roomRate.getReservations().add(reservation);
-                    }
-                    
-                    //Associate Reservation and Guest
-                    Guest walkInGuest = new Guest();
-                    Long guestId = guestSessionBeanLocal.createNewGuest(walkInGuest);
-                    reservation.setGuest(walkInGuest);
-                    walkInGuest.getReservations().add(reservation);
-                    
-                    
-                } catch (InputDataValidationException | UnknownPersistenceException | GuestEmailExistException ex) {
-                    throw new ReserveRoomException(ex.getMessage());
-                }
-
-                
-
-                //Allocation Logic if past 2am and checkindate
-                if (handleDateTimeSessionBean.isToday(checkinDate) & handleDateTimeSessionBean.isPassed2AM()) {
-                    try {
-                        allocationSessionBean.allocateRoom(reservation);
-                    } catch (Exception ex) {
-
-                    }
-                };
-
-                return reservation.getReservationId();
+                totalPrice += walkInRate.getRate().doubleValue();
 
             } else {
+
+                throw new CannotGetWalkInPriceException("No rates for Date: " + dateStayed
+                        + " for Room Type: " + roomType.getName()
+                        + " (ie. cannot book for whole period)");
+
+            }
+
+        }
+
+        roomTypeNameAndTotalPrice.put(roomType.getName(), BigDecimal.valueOf(totalPrice));
+        return totalPrice;
+    }
+
+    public Double getOnlinePriceForRoomType(RoomType roomType, Date checkinDate, Date checkoutDate) throws CannotGetOnlinePriceException {
+
+        Double totalPrice = 0.0;
+
+        List<Date> datesStayed = handleDateTimeSessionBean.retrieveDatesBetween(checkinDate, checkoutDate);
+
+        for (Date dateStayed : datesStayed) {
+
+            Query query = em.createQuery("SELECT rr FROM RoomRate rr "
+                    + "WHERE rr.roomType = :inRoomType "
+                    + "AND (:inDateStayed BETWEEN rr.startDate AND rr.endDate) "
+                    + "AND NOT rr.disabled "
+                    + "ORDER BY rr.roomRateType DESC"); //Need to test if really sort by enum field priority (natural ordering vs. string)
+            query.setParameter("inRoomType", roomType);
+            query.setParameter(":inDateStayed", dateStayed);
+            RoomRate roomRate = (RoomRate) query.getSingleResult();
+
+            if (roomRate != null) {
+
+                totalPrice += roomRate.getRate().doubleValue();
+
+            } else {
+
+                throw new CannotGetOnlinePriceException("No rates for Date: " + dateStayed
+                        + " for Room Type: " + roomType.getName()
+                        + " (ie. cannot book for whole period)");
+
+            }
+
+        }
+
+        roomTypeNameAndTotalPrice.put(roomType.getName(), BigDecimal.valueOf(totalPrice));
+        return totalPrice;
+    }
+
+    @Override
+    public List<Long> walkInReserveRoom(String roomTypeName, Integer numOfRoomsToReserve, Date checkinDate, Date checkoutDate) throws ReserveRoomException {
+
+        try {
+
+            //Confirm Input With Search Results
+            Integer availableRooms = searchRoomResults.get(roomTypeName);
+            RoomType roomType = roomTypeSessionBean.retrieveRoomTypeByName(roomTypeName);
+            BigDecimal totalPrice = roomTypeNameAndTotalPrice.get(roomTypeName);
+            
+            List<Long> reservationIds = new ArrayList<>();
+
+            for (RoomRate roomRate : roomRatesForReservation) {
+                if (roomRate.isDisabled()) {
+                    throw new ReserveRoomException("A Room Rate for your specified Room Type has been diabled."
+                            + "Please search room again.");
+                }
+            }
+
+            if (searchRoomResults.containsKey(roomTypeName) & numOfRoomsToReserve <= availableRooms) {
+
+                //Creating Reservation & Associating Room Type
+                try {
+                    for (int roomCount = 0; roomCount < numOfRoomsToReserve; roomCount++) {
+
+                        Reservation reservation = new Reservation(checkinDate, checkoutDate, totalPrice);
+
+                        reservation = reservationSessionBean.createReservation(roomType.getRoomTypeId(), reservation);
+
+                        //Associate Room Rate
+                        for (RoomRate roomRate : roomRatesForReservation) {
+                            roomRate.getReservations().add(reservation);
+                        }
+
+                        //Associate Guest
+                        Guest walkInGuest = new Guest();
+                        Long guestId = guestSessionBeanLocal.createNewGuest(walkInGuest);
+                        reservation.setGuest(walkInGuest);
+                        walkInGuest.getReservations().add(reservation);
+
+                        //Allocate Room If It Is Past 2AM On Checkin Day
+                        if (handleDateTimeSessionBean.isToday(checkinDate) & handleDateTimeSessionBean.isPassed2AM()) {
+
+                            allocationSessionBean.allocateRoom(reservation);
+
+                        };
+
+                        reservationIds.add(reservation.getReservationId());
+                    }
+                    
+                    return reservationIds;
+                    
+                } catch (InputDataValidationException | UnknownPersistenceException | GuestEmailExistException | CannotGetTodayDateException ex) {
+
+                    throw new ReserveRoomException(ex.getMessage());
+
+                }
+
+            } else {
+
                 if (!searchRoomResults.containsKey(roomTypeName)) {
+
                     throw new ReserveRoomException("Invalid Room Type");
-                } else {
+
+                } else  {
+
                     throw new ReserveRoomException("Not enough rooms");
+
                 }
             }
         } catch (RoomTypeNotFoundException ex) {
+
             throw new ReserveRoomException(ex.getMessage());
+
         }
     }
+
+    /**
+     * public Long onlineReserveRoom(String roomTypeName, Integer
+     * numOfRoomsToReserve, Date checkinDate, Date checkoutDate, Guest
+     * loggedInGuest) throws ReserveRoomException { }
+     *
+     */
+
+    @Override
+    public void saveSearchResults(String roomTypeName, Integer numOfAvailablerooms) {
+        searchRoomResults.put(roomTypeName, numOfAvailablerooms);
+    }
     
-    
+    /**
     public Long onlineReserveRoom(String roomTypeName, Integer numOfRoomsToReserve, Date checkinDate, Date checkoutDate, Guest loggedInGuest) throws ReserveRoomException {
     }
+    **/
     
     @Override
     public List<Room> checkinGuest(Long guestId) throws CheckinGuestException {
@@ -221,29 +282,13 @@ public class BookingReservationSessionBean implements BookingReservationSessionB
         
         return guestRooms;
     }
-    
-    /**
-    public Room CheckInGuest(Long guestId) throws CheckinGuestException {
-
-        Room room = reservation
-
-        if (room == null) {
-
-            throw new CheckinGuestException("Sorry! The hotel has no rooms of all types for your reservation :( ");
-
-        } else {
-
-            return room;
-        }
-    }
-    **/
 
     @Override
     public void checkoutGuest(Long guestId) {
 
         List<Room> rooms = roomSessionBeanLocal.viewAllRooms();
         
-        for (Room room:rooms)
+        for (Room room : rooms)
         {
             if(room.getCurrentReservation().getGuest().getGuestId() == guestId)
             {
@@ -261,68 +306,6 @@ public class BookingReservationSessionBean implements BookingReservationSessionB
                 
             }
         }
-        
-//        Room room = reservation.getRoom();
-//
-//        if (room == null) {
-//            
-//            throw new CheckoutGuestException("Cannot find room associated with reservation");
-//
-//        } else {
-//
-//            room.setCurrentReservation(null);
-//            room.setStatus(RoomStatusEnum.AVAILABLE);
-//            
-//            return room;
-//
-//        }
     }
 
-//    public List<SearchResult> WalkInSearchRoom(Date checkinDate, Date checkoutDate) {
-//
-//        List<SearchResult> searchResults = new ArrayList<>();
-//        List<RoomType> roomTypes = roomTypeSessionBean.viewAllRoomTypes();
-//
-//        for (RoomType roomType : roomTypes) {
-//
-//            //Number of Rooms Logic
-//            Query numberReservationsQuery = em.createQuery("SELECT COUNT(r) FROM Reservation r WHERE"
-//                    + " (r.startDate BETWEEN :checkinDate AND :checkoutDate)"
-//                    + " OR (r.endDate BETWEEN :checkinDate AND :checkoutDate");
-//            numberReservationsQuery.setParameter("checkinDate", checkinDate);
-//            numberReservationsQuery.setParameter("checkoutDate", checkoutDate);
-//            Integer numRoomsAvailable = (Integer) numberReservationsQuery.getSingleResult();
-//
-//            //Pricing Logic
-//            Double totalPrice = 0.0;
-//            for (RoomRate roomRate : roomType.getRoomRates()) {
-//                if (roomRate.getRoomRateType().equals(RoomRateTypeEnum.PUBLISHED)) {
-//                    long diff = checkoutDate.getTime() - checkinDate.getTime();
-//                    totalPrice = TimeUnit.DAYS.convert(diff, TimeUnit.SECONDS) * roomRate.getRate().doubleValue();
-//                }
-//            }
-//        }
-//        return searchResults;
-//    }
-    // Walkin reserve room -> same as reserve room on HoRs except one local one remote
-//    public Reservation WalkInReserveRoom(RoomType roomType, Date checkinDate, Date checkoutDate) throws InputDataValidationException, UnknownPersistenceException, RoomTypeNotFoundException {
-//
-//        //Creating Reservation & Associating Room Type
-//        Reservation reservation = new Reservation(checkinDate, checkoutDate);
-//        reservationSessionBean.createReservation(roomType.getRoomTypeId(), reservation);
-//
-//        //Associating Room Rate
-//        for (RoomRate roomRate : roomType.getRoomRates()) {
-//            if (roomRate.getRoomRateType().equals(RoomRateTypeEnum.PUBLISHED)) {
-//                reservation.setRoomRate(roomRate);
-//            }
-//        }
-//
-//        //Allocation Logic if past 2am and checkindate
-//        if (isToday(checkinDate) & isPassed2AM()) {
-//            // Call alloacte room logic
-//        };
-//
-//        return reservation;
-//    }
 }
