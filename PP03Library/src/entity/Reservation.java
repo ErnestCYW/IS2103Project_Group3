@@ -56,9 +56,11 @@ public class Reservation implements Serializable {
     @JoinColumn(nullable = false)
     private RoomType roomType;
     
-    @ManyToOne(optional = false)
-    @JoinColumn(nullable = false)
+    @ManyToOne
     private Guest guest;
+    
+    @ManyToOne
+    private Partner partner;
 
     public Reservation() {
     }

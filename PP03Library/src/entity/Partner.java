@@ -6,11 +6,13 @@
 package entity;
 
 import java.io.Serializable;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -32,6 +34,9 @@ public class Partner implements Serializable {
     @Column(nullable = false)
     @NotNull
     private String password;
+    
+    @OneToMany(mappedBy = "partner")
+    List<Reservation> reservations;
 
     public Partner() {
     }
