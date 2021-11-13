@@ -8,7 +8,9 @@ package ejb.session.stateful;
 import entity.Guest;
 import entity.Room;
 import entity.RoomType;
+import java.math.BigDecimal;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import javax.ejb.Remote;
 import util.exception.CannotGetOnlinePriceException;
@@ -40,4 +42,7 @@ public interface BookingReservationSessionBeanRemote {
 
     public List<Long> onlineReserveRoom(String roomTypeName, Integer numOfRoomsToReserve, Date checkinDate, Date checkoutDate, Guest loggedInGuest) throws ReserveRoomException;    
     
+    public HashMap<String, Integer> getSearchRoomResults();
+
+    public HashMap<String, BigDecimal> getRoomTypeNameAndTotalPrice();
 }

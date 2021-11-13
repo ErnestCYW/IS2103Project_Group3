@@ -135,8 +135,9 @@ public class PartnerSessionBean implements PartnerSessionBeanRemote, PartnerSess
     }
     
     
+    
     @Override
-    public Reservation viewPartnerReservation(long reservationId, Partner partner) throws ReservationNotFoundException, InvalidLoginCredentialException {
+    public Reservation viewPartnerReservation(Long reservationId, Partner partner) throws ReservationNotFoundException, InvalidLoginCredentialException {
         
         Reservation reservation = reservationSessionBeanLocal.viewReservation(reservationId);
         
@@ -149,6 +150,7 @@ public class PartnerSessionBean implements PartnerSessionBeanRemote, PartnerSess
     }
     
    
+    
     
     @Override
     public List<Reservation> viewReservations(Partner partner) {

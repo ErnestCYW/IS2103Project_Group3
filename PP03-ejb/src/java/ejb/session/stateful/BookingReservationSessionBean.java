@@ -45,6 +45,22 @@ import util.exception.UnknownPersistenceException;
 @Stateful
 public class BookingReservationSessionBean implements BookingReservationSessionBeanRemote, BookingReservationSessionBeanLocal {
 
+    /**
+     * @return the searchRoomResults
+     */
+    @Override
+    public HashMap<String, Integer> getSearchRoomResults() {
+        return searchRoomResults;
+    }
+
+    /**
+     * @return the roomTypeNameAndTotalPrice
+     */
+    @Override
+    public HashMap<String, BigDecimal> getRoomTypeNameAndTotalPrice() {
+        return roomTypeNameAndTotalPrice;
+    }
+
     @EJB
     private RoomSessionBeanLocal roomSessionBeanLocal;
 
@@ -140,7 +156,7 @@ public class BookingReservationSessionBean implements BookingReservationSessionB
 
         }
 
-        roomTypeNameAndTotalPrice.put(roomType.getName(), BigDecimal.valueOf(totalPrice));
+        getRoomTypeNameAndTotalPrice().put(roomType.getName(), BigDecimal.valueOf(totalPrice));
         return totalPrice;
     }
 
@@ -176,7 +192,7 @@ public class BookingReservationSessionBean implements BookingReservationSessionB
 
         }
 
-        roomTypeNameAndTotalPrice.put(roomType.getName(), BigDecimal.valueOf(totalPrice));
+        getRoomTypeNameAndTotalPrice().put(roomType.getName(), BigDecimal.valueOf(totalPrice));
         return totalPrice;
     }
 
@@ -186,9 +202,9 @@ public class BookingReservationSessionBean implements BookingReservationSessionB
         try {
 
             //Confirm Input With Search Results
-            Integer availableRooms = searchRoomResults.get(roomTypeName);
+            Integer availableRooms = getSearchRoomResults().get(roomTypeName);
             RoomType roomType = roomTypeSessionBean.retrieveRoomTypeByName(roomTypeName);
-            BigDecimal totalPrice = roomTypeNameAndTotalPrice.get(roomTypeName);
+            BigDecimal totalPrice = getRoomTypeNameAndTotalPrice().get(roomTypeName);
 
             List<Long> reservationIds = new ArrayList<>();
 
@@ -270,9 +286,9 @@ public class BookingReservationSessionBean implements BookingReservationSessionB
         try {
 
             //Confirm Input With Search Results
-            Integer availableRooms = searchRoomResults.get(roomTypeName);
+            Integer availableRooms = getSearchRoomResults().get(roomTypeName);
             RoomType roomType = roomTypeSessionBean.retrieveRoomTypeByName(roomTypeName);
-            BigDecimal totalPrice = roomTypeNameAndTotalPrice.get(roomTypeName);
+            BigDecimal totalPrice = getRoomTypeNameAndTotalPrice().get(roomTypeName);
 
             List<Long> reservationIds = new ArrayList<>();
 
@@ -343,7 +359,7 @@ public class BookingReservationSessionBean implements BookingReservationSessionB
 
     @Override
     public void saveSearchResults(String roomTypeName, Integer numOfAvailablerooms) {
-        searchRoomResults.put(roomTypeName, numOfAvailablerooms);
+        getSearchRoomResults().put(roomTypeName, numOfAvailablerooms);
     }
 
     /**

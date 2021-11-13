@@ -137,8 +137,9 @@ public class GuestSessionBean implements GuestSessionBeanRemote, GuestSessionBea
         }
     }
 
+    
     @Override
-    public Reservation viewGuestReservation(long reservationId, Guest guest) throws ReservationNotFoundException, InvalidLoginCredentialException {
+    public Reservation viewGuestReservation(Long reservationId, Guest guest) throws ReservationNotFoundException, InvalidLoginCredentialException {
         
         Reservation reservation = reservationSessionBean.viewReservation(reservationId);
         

@@ -6,6 +6,7 @@
 package entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -36,12 +37,14 @@ public class Partner implements Serializable {
     private String password;
     
     @OneToMany(mappedBy = "partner")
-    List<Reservation> reservations;
+    private List<Reservation> reservations;
 
     public Partner() {
+        this.reservations = new ArrayList<>();
     }
 
     public Partner(String partnerName, String password) {
+        this();
         this.partnerName = partnerName;
         this.password = password;
     }
@@ -105,6 +108,20 @@ public class Partner implements Serializable {
      */
     public void setPassword(String password) {
         this.password = password;
+    }
+    
+    /**
+     * @return the reservations
+     */
+    public List<Reservation> getReservations() {
+        return reservations;
+    }
+
+    /**
+     * @param reservations the reservations to set
+     */
+    public void setReservations(List<Reservation> reservations) {
+        this.reservations = reservations;
     }
     
 }
