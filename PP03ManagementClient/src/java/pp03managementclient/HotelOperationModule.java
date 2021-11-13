@@ -164,6 +164,13 @@ public class HotelOperationModule {
 
         }
         newRoomType.setAmenities(amenities);
+        
+        System.out.print("Enter Next Higher Room Type (If None, Enter 'blank') > ");
+        String nextHigherRoomType = scanner.nextLine().trim();
+        if(nextHigherRoomType.length() > 0)
+        {
+            newRoomType.setNextHigherRoomType(nextHigherRoomType);
+        }
 
         try {
             RoomType createdRoomType = roomTypeSessionBeanRemote.createNewRoomType(newRoomType);
