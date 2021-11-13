@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -212,6 +213,8 @@ public class BookingReservationSessionBean implements BookingReservationSessionB
                     for (int roomCount = 0; roomCount < numOfRoomsToReserve; roomCount++) {
 
                         Reservation reservation = new Reservation(checkinDate, checkoutDate, totalPrice);
+                        reservation.setGuest(walkInGuest);
+                        walkInGuest.getReservations().add(reservation);
 
                         reservation = reservationSessionBean.createReservation(roomType.getRoomTypeId(), reservation);
 
@@ -221,7 +224,7 @@ public class BookingReservationSessionBean implements BookingReservationSessionB
                         }
 
                         //Associate Guest
-                        Guest guest = guestSessionBeanLocal.retrieveGuestByGuestId(guestId);
+                        //Guest guest = guestSessionBeanLocal.retrieveGuestByGuestId(guestId);
                         reservation.setGuest(walkInGuest);
                         walkInGuest.getReservations().add(reservation);
 
@@ -237,7 +240,7 @@ public class BookingReservationSessionBean implements BookingReservationSessionB
 
                     return reservationIds;
 
-                } catch (InputDataValidationException | UnknownPersistenceException | GuestEmailExistException | CannotGetTodayDateException | GuestNotFoundException ex) {
+                } catch (InputDataValidationException | UnknownPersistenceException | GuestEmailExistException | CannotGetTodayDateException ex) {
 
                     throw new ReserveRoomException(ex.getMessage());
 
@@ -357,7 +360,9 @@ public class BookingReservationSessionBean implements BookingReservationSessionB
         List<Room> guestRooms = new ArrayList<>();
 
         for (Room room : rooms) {
-            if (room.getCurrentReservation().getGuest().getGuestId() == guestId) {
+            if (room.getCurrentReservation() == null) {
+                continue;
+            } else if (room.getCurrentReservation().getGuest().getGuestId() == guestId) {
                 guestRooms.add(room);
             }
         }
@@ -375,7 +380,9 @@ public class BookingReservationSessionBean implements BookingReservationSessionB
         List<Room> rooms = roomSessionBeanLocal.viewAllRooms();
 
         for (Room room : rooms) {
-            if (room.getCurrentReservation().getGuest().getGuestId() == guestId) {
+            if (room.getCurrentReservation() == null) {
+                continue;
+            } if (room.getCurrentReservation().getGuest().getGuestId() == guestId) {
                 room.setCurrentReservation(null);
                 room.setStatus(RoomStatusEnum.AVAILABLE);
 

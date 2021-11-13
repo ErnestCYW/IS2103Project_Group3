@@ -67,7 +67,8 @@ public class AllocationSessionBean implements AllocationSessionBeanRemote, Alloc
                 + "AND r.roomType = :inRoomType "
                 + "AND NOT r.disabled");
         availableSameTypeRoomsQuery.setParameter("inRoomType", roomType);
-        Room availableSameTypeRoom = (Room) availableSameTypeRoomsQuery.getSingleResult();
+        List<Room> temp = availableSameTypeRoomsQuery.setMaxResults(1).getResultList();
+        Room availableSameTypeRoom = temp.get(0);
 
         if (availableSameTypeRoom != null) {
 
@@ -88,7 +89,7 @@ public class AllocationSessionBean implements AllocationSessionBeanRemote, Alloc
                         + "AND r.roomType = :inRoomType "
                         + "AND NOT r.disabled");
                 availableDifferentTypeRoomsQuery.setParameter("inRoomType", roomType.getNextHigherRoomType());
-                Room availableDifferentTypeRoom = (Room) availableDifferentTypeRoomsQuery.getSingleResult();
+                Room availableDifferentTypeRoom = (Room) availableDifferentTypeRoomsQuery.setMaxResults(1).getResultList();
 
                 if (availableDifferentTypeRoom != null) {
 
