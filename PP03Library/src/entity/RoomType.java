@@ -22,51 +22,51 @@ import javax.validation.constraints.NotNull;
  */
 @Entity
 public class RoomType implements Serializable {
-    
+
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long roomTypeId;
-    
-    @Column(nullable = false, unique = true) 
+
+    @Column(nullable = false, unique = true)
     @NotNull
     private String name;
-    
+
     @Column(nullable = false)
     @NotNull
     private String description;
-    
+
     @Column(nullable = false)
     @NotNull
     private String size;
-    
+
     @Column(nullable = false)
     @NotNull
     private String bed;
-    
+
     @Column(nullable = false)
     @NotNull
     private Integer capacity;
-    
+
     @Column(nullable = false)
     @NotNull
     private List<String> amenities;
-    
+
     @Column(nullable = false)
     @NotNull
     private boolean disabled;
-    
+
     private String nextHigherRoomType;
-    
+
     @OneToMany(mappedBy = "roomType")
     private List<Room> rooms;
-    
+
     @OneToMany(mappedBy = "roomType")
     private List<Reservation> reservations;
-    
+
     @OneToMany(mappedBy = "roomType")
     private List<RoomRate> roomRates;
-    
+
     public RoomType() {
         this.amenities = new ArrayList<>();
         this.disabled = false;
@@ -74,7 +74,7 @@ public class RoomType implements Serializable {
         this.reservations = new ArrayList<>();
         this.roomRates = new ArrayList<>();
     }
-    
+
     public RoomType(String name, String description, String size, String bed, Integer capacity){
         this();
         this.name = name;
@@ -237,7 +237,7 @@ public class RoomType implements Serializable {
     public void setAmenities(List<String> amenities) {
         this.amenities = amenities;
     }
-    
+
     /**
      * @return the disabled
      */
@@ -251,7 +251,7 @@ public class RoomType implements Serializable {
     public void setDisabled(boolean disabled) {
         this.disabled = disabled;
     }
-    
+
     /**
      * @return the reservations
      */
@@ -279,5 +279,5 @@ public class RoomType implements Serializable {
     public void setNextHigherRoomType(String nextHigherRoomType) {
         this.nextHigherRoomType = nextHigherRoomType;
     }
-    
+
 }

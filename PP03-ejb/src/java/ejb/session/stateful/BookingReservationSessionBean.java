@@ -42,7 +42,7 @@ public class BookingReservationSessionBean implements BookingReservationSessionB
 
     @EJB
     private RoomSessionBeanLocal roomSessionBeanLocal;
-    
+
     @EJB
     private GuestSessionBeanLocal guestSessionBeanLocal;
 
@@ -176,7 +176,7 @@ public class BookingReservationSessionBean implements BookingReservationSessionB
             Integer availableRooms = searchRoomResults.get(roomTypeName);
             RoomType roomType = roomTypeSessionBean.retrieveRoomTypeByName(roomTypeName);
             BigDecimal totalPrice = roomTypeNameAndTotalPrice.get(roomTypeName);
-            
+
             List<Long> reservationIds = new ArrayList<>();
 
             for (RoomRate roomRate : roomRatesForReservation) {
@@ -190,6 +190,10 @@ public class BookingReservationSessionBean implements BookingReservationSessionB
 
                 //Creating Reservation & Associating Room Type
                 try {
+
+                    Guest walkInGuest = new Guest();
+                    guestSessionBeanLocal.createNewGuest(walkInGuest);
+
                     for (int roomCount = 0; roomCount < numOfRoomsToReserve; roomCount++) {
 
                         Reservation reservation = new Reservation(checkinDate, checkoutDate, totalPrice);
@@ -202,8 +206,6 @@ public class BookingReservationSessionBean implements BookingReservationSessionB
                         }
 
                         //Associate Guest
-                        Guest walkInGuest = new Guest();
-                        Long guestId = guestSessionBeanLocal.createNewGuest(walkInGuest);
                         reservation.setGuest(walkInGuest);
                         walkInGuest.getReservations().add(reservation);
 
@@ -216,9 +218,9 @@ public class BookingReservationSessionBean implements BookingReservationSessionB
 
                         reservationIds.add(reservation.getReservationId());
                     }
-                    
+
                     return reservationIds;
-                    
+
                 } catch (InputDataValidationException | UnknownPersistenceException | GuestEmailExistException | CannotGetTodayDateException ex) {
 
                     throw new ReserveRoomException(ex.getMessage());
@@ -231,7 +233,7 @@ public class BookingReservationSessionBean implements BookingReservationSessionB
 
                     throw new ReserveRoomException("Invalid Room Type");
 
-                } else  {
+                } else {
 
                     throw new ReserveRoomException("Not enough rooms");
 
@@ -244,42 +246,109 @@ public class BookingReservationSessionBean implements BookingReservationSessionB
         }
     }
 
-    /**
-     * public Long onlineReserveRoom(String roomTypeName, Integer
-     * numOfRoomsToReserve, Date checkinDate, Date checkoutDate, Guest
-     * loggedInGuest) throws ReserveRoomException { }
-     *
-     */
+     public List<Long> onlineReserveRoom(String roomTypeName, Integer numOfRoomsToReserve, Date checkinDate, Date checkoutDate, Guest loggedInGuest) throws ReserveRoomException {
+     
+        try {
+
+            //Confirm Input With Search Results
+            Integer availableRooms = searchRoomResults.get(roomTypeName);
+            RoomType roomType = roomTypeSessionBean.retrieveRoomTypeByName(roomTypeName);
+            BigDecimal totalPrice = roomTypeNameAndTotalPrice.get(roomTypeName);
+
+            List<Long> reservationIds = new ArrayList<>();
+
+            for (RoomRate roomRate : roomRatesForReservation) {
+                if (roomRate.isDisabled()) {
+                    throw new ReserveRoomException("A Room Rate for your specified Room Type has been diabled."
+                            + "Please search room again.");
+                }
+            }
+
+            if (searchRoomResults.containsKey(roomTypeName) & numOfRoomsToReserve <= availableRooms) {
+
+                //Creating Reservation & Associating Room Type
+                try {
+
+                    for (int roomCount = 0; roomCount < numOfRoomsToReserve; roomCount++) {
+
+                        Reservation reservation = new Reservation(checkinDate, checkoutDate, totalPrice);
+
+                        reservation = reservationSessionBean.createReservation(roomType.getRoomTypeId(), reservation);
+
+                        //Associate Room Rate
+                        for (RoomRate roomRate : roomRatesForReservation) {
+                            roomRate.getReservations().add(reservation);
+                        }
+
+                        //Associate Guest
+                        reservation.setGuest(loggedInGuest);
+                        loggedInGuest.getReservations().add(reservation);
+
+                        //Allocate Room If It Is Past 2AM On Checkin Day
+                        if (handleDateTimeSessionBean.isToday(checkinDate) & handleDateTimeSessionBean.isPassed2AM()) {
+
+                            allocationSessionBean.allocateRoom(reservation);
+
+                        };
+
+                        reservationIds.add(reservation.getReservationId());
+                    }
+
+                    return reservationIds;
+
+                } catch (InputDataValidationException | UnknownPersistenceException | CannotGetTodayDateException ex) {
+
+                    throw new ReserveRoomException(ex.getMessage());
+
+                }
+
+            } else {
+
+                if (!searchRoomResults.containsKey(roomTypeName)) {
+
+                    throw new ReserveRoomException("Invalid Room Type");
+
+                } else {
+
+                    throw new ReserveRoomException("Not enough rooms");
+
+                }
+            }
+        } catch (RoomTypeNotFoundException ex) {
+
+            throw new ReserveRoomException(ex.getMessage());
+
+        }
+     
+     }
 
     @Override
     public void saveSearchResults(String roomTypeName, Integer numOfAvailablerooms) {
         searchRoomResults.put(roomTypeName, numOfAvailablerooms);
     }
-    
+
     /**
-    public Long onlineReserveRoom(String roomTypeName, Integer numOfRoomsToReserve, Date checkinDate, Date checkoutDate, Guest loggedInGuest) throws ReserveRoomException {
-    }
-    **/
-    
+     * public Long onlineReserveRoom(String roomTypeName, Integer
+     * numOfRoomsToReserve, Date checkinDate, Date checkoutDate, Guest
+     * loggedInGuest) throws ReserveRoomException { }
+    *
+     */
     @Override
     public List<Room> checkinGuest(Long guestId) throws CheckinGuestException {
-        
+
         List<Room> rooms = roomSessionBeanLocal.viewAllRooms();
         List<Room> guestRooms = new ArrayList<>();
-        
-        for (Room room:rooms)
-        {
-            if(room.getCurrentReservation().getGuest().getGuestId() == guestId)
-            {
+
+        for (Room room : rooms) {
+            if (room.getCurrentReservation().getGuest().getGuestId() == guestId) {
                 guestRooms.add(room);
             }
         }
-        
-        if(guestRooms.isEmpty())
-        {
+
+        if (guestRooms.isEmpty()) {
             throw new CheckinGuestException("There are no rooms available for Check-in");
         }
-        
+
         return guestRooms;
     }
 
@@ -287,23 +356,19 @@ public class BookingReservationSessionBean implements BookingReservationSessionB
     public void checkoutGuest(Long guestId) {
 
         List<Room> rooms = roomSessionBeanLocal.viewAllRooms();
-        
-        for (Room room : rooms)
-        {
-            if(room.getCurrentReservation().getGuest().getGuestId() == guestId)
-            {
+
+        for (Room room : rooms) {
+            if (room.getCurrentReservation().getGuest().getGuestId() == guestId) {
                 room.setCurrentReservation(null);
                 room.setStatus(RoomStatusEnum.AVAILABLE);
-                
+
                 //Disassociating Room Rate and Reservation
-                for(RoomRate roomRate : roomRatesForReservation)
-                {
-                    if(roomRate.getReservations().contains(room.getCurrentReservation()))
-                    {
+                for (RoomRate roomRate : roomRatesForReservation) {
+                    if (roomRate.getReservations().contains(room.getCurrentReservation())) {
                         roomRate.getReservations().remove(room.getCurrentReservation());
                     }
                 }
-                
+
             }
         }
     }
