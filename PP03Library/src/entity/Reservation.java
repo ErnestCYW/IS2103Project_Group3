@@ -29,20 +29,6 @@ import javax.validation.constraints.NotNull;
 @Entity
 public class Reservation implements Serializable {
 
-    /**
-     * @return the partner
-     */
-    public Partner getPartner() {
-        return partner;
-    }
-
-    /**
-     * @param partner the partner to set
-     */
-    public void setPartner(Partner partner) {
-        this.partner = partner;
-    }
-
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -59,7 +45,7 @@ public class Reservation implements Serializable {
     @NotNull
     @Future
     private Date endDate;
-    
+
     @Column(nullable = false, precision = 11, scale = 2)
     @NotNull
     @DecimalMin("0.00")
@@ -69,12 +55,12 @@ public class Reservation implements Serializable {
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private RoomType roomType;
-    
+
     @ManyToOne
     private Guest guest;
-    
-    //@ManyToOne
-    //private Partner partner;
+
+    @ManyToOne
+    private Partner partner;
 
     public Reservation() {
     }
@@ -187,6 +173,20 @@ public class Reservation implements Serializable {
      */
     public void setGuest(Guest guest) {
         this.guest = guest;
+    }
+
+    /**
+     * @return the partner
+     */
+    public Partner getPartner() {
+        return partner;
+    }
+
+    /**
+     * @param partner the partner to set
+     */
+    public void setPartner(Partner partner) {
+        this.partner = partner;
     }
 
 }
