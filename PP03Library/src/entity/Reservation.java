@@ -73,8 +73,8 @@ public class Reservation implements Serializable {
     @ManyToOne
     private Guest guest;
     
-    @ManyToOne
-    private Partner partner;
+    //@ManyToOne
+    //private Partner partner;
 
     public Reservation() {
     }
