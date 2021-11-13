@@ -73,12 +73,12 @@ public class RoomRate implements Serializable {
     private List<Reservation> reservations;
 
     public RoomRate() {
-        this.startDate = new Date();
         Calendar c = Calendar.getInstance();
-        c.setTime(this.startDate);
-        c.add(Calendar.YEAR, 10);
-        Date newEndDate = c.getTime();
-        this.endDate = newEndDate;
+        c.setTime(new Date());
+        c.add(Calendar.YEAR, -1);
+        this.startDate = c.getTime();
+        c.add(Calendar.YEAR, 11);
+        this.endDate = c.getTime();
         this.disabled = false;
         this.reservations = new ArrayList<>();
     }

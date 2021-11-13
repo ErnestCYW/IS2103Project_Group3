@@ -35,7 +35,7 @@ public class FrontOfficeModule {
     public FrontOfficeModule() {
     }
 
-    public FrontOfficeModule(RoomTypeSessionBeanRemote roomTypeSessionBeanRemote, BookingReservationSessionBeanRemote bookingSessionBeanRemote, Employee loggedInEmployee) {
+    public FrontOfficeModule(RoomTypeSessionBeanRemote roomTypeSessionBeanRemote, BookingReservationSessionBeanRemote bookingReservationSessionBeanRemote, Employee loggedInEmployee) {
         this.roomTypeSessionBeanRemote = roomTypeSessionBeanRemote;
         this.bookingReservationSessionBeanRemote = bookingReservationSessionBeanRemote;
         this.loggedInEmployee = loggedInEmployee;
@@ -106,7 +106,7 @@ public class FrontOfficeModule {
             for (RoomType roomType : roomTypes) {
                 try {
                     Integer availableRooms = bookingReservationSessionBeanRemote.getNumOfAvailableRoomsForRoomType(roomType.getRoomTypeId(), checkinDate, checkoutDate);
-
+                    
                     if (availableRooms >= numOfRooms) {
                         Double reservationAmount = bookingReservationSessionBeanRemote.getWalkInPriceForRoomType(roomType, checkinDate, checkoutDate);
                         //save search results to Session Bean

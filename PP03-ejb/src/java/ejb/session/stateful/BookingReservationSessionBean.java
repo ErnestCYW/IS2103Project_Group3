@@ -21,9 +21,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 import javax.ejb.EJB;
 import javax.ejb.Stateful;
 import javax.persistence.EntityManager;
+import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import util.enumeration.RoomStatusEnum;
@@ -82,18 +84,19 @@ public class BookingReservationSessionBean implements BookingReservationSessionB
         Query countRoomsForTypeQuery = em.createQuery("SELECT COUNT(r) FROM Room r "
                 + "WHERE r.roomType = :inRoomType");
         countRoomsForTypeQuery.setParameter("inRoomType", roomType);
-        Integer numRoomsForType = (Integer) countRoomsForTypeQuery.getSingleResult();
+        Long numRoomsForType = (Long) countRoomsForTypeQuery.getSingleResult();
 
         Query countReservationsForTypeQuery = em.createQuery("SELECT COUNT(r) FROM Reservation r "
-                + "WHERE ((r.startDate BETWEEN :checkinDate AND :inCheckoutDate) "
-                + "OR (r.endDate BETWEEN :checkinDate AND :inCheckoutDate))"
+                + "WHERE ((r.startDate BETWEEN :inCheckinDate AND :inCheckoutDate) "
+                + "OR (r.endDate BETWEEN :inCheckinDate AND :inCheckoutDate))"
                 + "AND r.roomType = :inRoomType");
         countReservationsForTypeQuery.setParameter("inCheckinDate", checkinDate);
         countReservationsForTypeQuery.setParameter("inCheckoutDate", checkoutDate);
         countReservationsForTypeQuery.setParameter("inRoomType", roomType);
-        Integer numReservationsForType = (Integer) countReservationsForTypeQuery.getSingleResult();
+        Long numReservationsForType = (Long) countReservationsForTypeQuery.getSingleResult();
 
-        return numRoomsForType - numReservationsForType;
+        Long result = numRoomsForType - numReservationsForType;
+        return result.intValue();
     }
 
     @Override
@@ -111,19 +114,25 @@ public class BookingReservationSessionBean implements BookingReservationSessionB
                     + "AND NOT rr.disabled "
                     + "AND rr.roomRateType = util.enumeration.RoomRateTypeEnum.PUBLISHED");
             walkInRatesQuery.setParameter("inRoomType", roomType);
-            walkInRatesQuery.setParameter(":inDateStayed", dateStayed);
-            RoomRate walkInRate = (RoomRate) walkInRatesQuery.getSingleResult();
+            walkInRatesQuery.setParameter("inDateStayed", dateStayed);
 
-            if (walkInRate != null) {
+            try {
+                RoomRate walkInRate = (RoomRate) walkInRatesQuery.getSingleResult();
 
-                totalPrice += walkInRate.getRate().doubleValue();
+                if (walkInRate != null) {
 
-            } else {
+                    totalPrice += walkInRate.getRate().doubleValue();
 
-                throw new CannotGetWalkInPriceException("No rates for Date: " + dateStayed
-                        + " for Room Type: " + roomType.getName()
-                        + " (ie. cannot book for whole period)");
+                } else {
 
+                    throw new CannotGetWalkInPriceException("No rates for Date: " + dateStayed
+                            + " for Room Type: " + roomType.getName()
+                            + " (ie. cannot book for whole period)");
+
+                }
+
+            } catch (NonUniqueResultException ex) {
+                throw new CannotGetWalkInPriceException("More than one walkin price applicable");
             }
 
         }
@@ -192,7 +201,9 @@ public class BookingReservationSessionBean implements BookingReservationSessionB
                 //Creating Reservation & Associating Room Type
                 try {
 
-                    Guest walkInGuest = new Guest();
+                    Random rand = new Random();
+                    Integer int_random = rand.nextInt(9999999);
+                    Guest walkInGuest = new Guest(int_random.toString(),"password");
                     guestSessionBeanLocal.createNewGuest(walkInGuest);
 
                     for (int roomCount = 0; roomCount < numOfRoomsToReserve; roomCount++) {
@@ -248,8 +259,8 @@ public class BookingReservationSessionBean implements BookingReservationSessionB
     }
 
     @Override
-     public List<Long> onlineReserveRoom(String roomTypeName, Integer numOfRoomsToReserve, Date checkinDate, Date checkoutDate, Guest loggedInGuest) throws ReserveRoomException {
-     
+    public List<Long> onlineReserveRoom(String roomTypeName, Integer numOfRoomsToReserve, Date checkinDate, Date checkoutDate, Guest loggedInGuest) throws ReserveRoomException {
+
         try {
 
             //Confirm Input With Search Results
@@ -321,8 +332,8 @@ public class BookingReservationSessionBean implements BookingReservationSessionB
             throw new ReserveRoomException(ex.getMessage());
 
         }
-     
-     }
+
+    }
 
     @Override
     public void saveSearchResults(String roomTypeName, Integer numOfAvailablerooms) {
@@ -333,7 +344,7 @@ public class BookingReservationSessionBean implements BookingReservationSessionB
      * public Long onlineReserveRoom(String roomTypeName, Integer
      * numOfRoomsToReserve, Date checkinDate, Date checkoutDate, Guest
      * loggedInGuest) throws ReserveRoomException { }
-    *
+     *
      */
     @Override
     public List<Room> checkinGuest(Long guestId) throws CheckinGuestException {
