@@ -8,6 +8,7 @@ package entity;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.Column;
@@ -73,7 +74,11 @@ public class RoomRate implements Serializable {
 
     public RoomRate() {
         this.startDate = new Date();
-        this.endDate = new Date(Long.MAX_VALUE);
+        Calendar c = Calendar.getInstance();
+        c.setTime(this.startDate);
+        c.add(Calendar.YEAR, 10);
+        Date newEndDate = c.getTime();
+        this.endDate = newEndDate;
         this.disabled = false;
         this.reservations = new ArrayList<>();
     }

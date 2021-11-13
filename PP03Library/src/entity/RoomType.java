@@ -140,7 +140,7 @@ public class RoomType implements Serializable {
      * @param name the name to set
      */
     public void setName(String name) {
-        this.setName(name);
+        this.name = name;
     }
 
     /**
