@@ -37,7 +37,7 @@ public class Reservation implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false)
     @NotNull
-    @Future
+    //@Future //Inteferes if you are making a reservation today because of stripping time information from date validation done client side
     private Date startDate;
 
     @Temporal(TemporalType.TIMESTAMP)

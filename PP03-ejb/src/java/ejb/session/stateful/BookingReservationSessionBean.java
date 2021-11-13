@@ -22,6 +22,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.ejb.Stateful;
 import javax.persistence.EntityManager;
@@ -34,6 +36,7 @@ import util.exception.CannotGetTodayDateException;
 import util.exception.CannotGetWalkInPriceException;
 import util.exception.CheckinGuestException;
 import util.exception.GuestEmailExistException;
+import util.exception.GuestNotFoundException;
 import util.exception.InputDataValidationException;
 import util.exception.ReserveRoomException;
 import util.exception.RoomTypeNotFoundException;
@@ -204,7 +207,7 @@ public class BookingReservationSessionBean implements BookingReservationSessionB
                     Random rand = new Random();
                     Integer int_random = rand.nextInt(9999999);
                     Guest walkInGuest = new Guest(int_random.toString(),"password");
-                    guestSessionBeanLocal.createNewGuest(walkInGuest);
+                    Long guestId = guestSessionBeanLocal.createNewGuest(walkInGuest);
 
                     for (int roomCount = 0; roomCount < numOfRoomsToReserve; roomCount++) {
 
@@ -218,6 +221,7 @@ public class BookingReservationSessionBean implements BookingReservationSessionB
                         }
 
                         //Associate Guest
+                        Guest guest = guestSessionBeanLocal.retrieveGuestByGuestId(guestId);
                         reservation.setGuest(walkInGuest);
                         walkInGuest.getReservations().add(reservation);
 
@@ -233,7 +237,7 @@ public class BookingReservationSessionBean implements BookingReservationSessionB
 
                     return reservationIds;
 
-                } catch (InputDataValidationException | UnknownPersistenceException | GuestEmailExistException | CannotGetTodayDateException ex) {
+                } catch (InputDataValidationException | UnknownPersistenceException | GuestEmailExistException | CannotGetTodayDateException | GuestNotFoundException ex) {
 
                     throw new ReserveRoomException(ex.getMessage());
 
