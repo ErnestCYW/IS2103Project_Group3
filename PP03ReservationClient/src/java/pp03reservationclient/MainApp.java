@@ -34,24 +34,18 @@ import util.exception.UnknownPersistenceException;
 public class MainApp {
 
     private GuestSessionBeanRemote guestSessionBeanRemote;
-    private RoomSessionBeanRemote roomSessionBeanRemote;
-    private RoomRateSessionBeanRemote roomRateSessionBeanRemote;
     private RoomTypeSessionBeanRemote roomTypeSessionBeanRemote;
     private BookingReservationSessionBeanRemote bookingReservationSessionBeanRemote;
-    private HandleDateTimeSessionBeanRemote handleDateTimeSessionBeanRemote;
     
     private Guest loggedInGuest;
     
     public MainApp() {
     }
     
-    public MainApp(GuestSessionBeanRemote guestSessionBeanRemote, RoomSessionBeanRemote roomSessionBeanRemote, RoomRateSessionBeanRemote roomRateSessionBeanRemote, RoomTypeSessionBeanRemote roomTypeSessionBeanRemote, BookingReservationSessionBeanRemote bookingReservationSessionBeanRemote, HandleDateTimeSessionBeanRemote handleDateTimeSessionBeanRemote) {
+    public MainApp(GuestSessionBeanRemote guestSessionBeanRemote, RoomTypeSessionBeanRemote roomTypeSessionBeanRemote, BookingReservationSessionBeanRemote bookingReservationSessionBeanRemote) {
         this.guestSessionBeanRemote = guestSessionBeanRemote;
-        this.roomSessionBeanRemote = roomSessionBeanRemote;
-        this.roomRateSessionBeanRemote = roomRateSessionBeanRemote;
         this.roomTypeSessionBeanRemote = roomTypeSessionBeanRemote;
         this.bookingReservationSessionBeanRemote = bookingReservationSessionBeanRemote;
-        this.handleDateTimeSessionBeanRemote = handleDateTimeSessionBeanRemote;
     }
     
     
@@ -123,7 +117,7 @@ public class MainApp {
         
         if(username.length() > 0 && password.length() > 0)
         {
-            loggedInGuest = guestSessionBeanRemote.guestLogin(username, password);
+            this.loggedInGuest = guestSessionBeanRemote.guestLogin(username, password);
         }
         else 
         {
@@ -142,6 +136,7 @@ public class MainApp {
         newGuest.setEmail(scanner.nextLine().trim());
         System.out.print("Enter Password> ");
         newGuest.setPassword(scanner.nextLine().trim());
+        System.out.println(newGuest.getEmail());
         
         try{
             Long guestId = guestSessionBeanRemote.createNewGuest(newGuest);

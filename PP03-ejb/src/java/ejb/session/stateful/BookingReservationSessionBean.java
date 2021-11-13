@@ -159,7 +159,7 @@ public class BookingReservationSessionBean implements BookingReservationSessionB
                     + "AND NOT rr.disabled "
                     + "ORDER BY rr.roomRateType DESC"); //Need to test if really sort by enum field priority (natural ordering vs. string)
             query.setParameter("inRoomType", roomType);
-            query.setParameter(":inDateStayed", dateStayed);
+            query.setParameter("inDateStayed", dateStayed);
             RoomRate roomRate = (RoomRate) query.getSingleResult();
 
             if (roomRate != null) {
