@@ -42,8 +42,8 @@ public class FrontOfficeModule {
     }
 
     public void menuFrontOffice() throws InvalidEmployeeRoleException {
-        if (loggedInEmployee.getEmployeeRoleEnum() != EmployeeRoleEnum.GUEST_RELATION) {
-            throw new InvalidEmployeeRoleException("You don't have GUEST_RELATION rights to access the front office module.");
+        if (loggedInEmployee.getEmployeeRoleEnum() != EmployeeRoleEnum.GUEST_RELATION && loggedInEmployee.getEmployeeRoleEnum() != EmployeeRoleEnum.SYSTEM_ADMIN) {
+            throw new InvalidEmployeeRoleException("You don't have rights to access the front office module.");
         }
 
         Scanner scanner = new Scanner(System.in);

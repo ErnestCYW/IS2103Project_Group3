@@ -8,10 +8,12 @@ package ejb.session.singleton;
 import ejb.session.stateless.EmployeeSessionBeanLocal;
 import ejb.session.stateless.RoomRateSessionBeanLocal;
 import ejb.session.stateless.RoomTypeSessionBeanLocal;
+import ejb.session.stateless.RoomSessionBeanLocal;
 import entity.Employee;
 import entity.RoomRate;
 import entity.RoomType;
 import java.math.BigDecimal;
+import entity.Room;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Singleton;
@@ -19,6 +21,7 @@ import javax.ejb.LocalBean;
 import javax.ejb.Startup;
 import util.enumeration.EmployeeRoleEnum;
 import util.enumeration.RoomRateTypeEnum;
+
 import util.exception.EmployeeNotFoundException;
 import util.exception.EmployeeUsernameExistException;
 import util.exception.InputDataValidationException;
@@ -36,7 +39,12 @@ import util.exception.UnknownPersistenceException;
 public class DataInitSessionBean {
 
     @EJB
+    private RoomSessionBeanLocal roomSessionBeanLocal;
+
+    @EJB
     private EmployeeSessionBeanLocal employeeSessionBeanLocal;
+    
+    
 
     @EJB
     private RoomTypeSessionBeanLocal roomTypeSessionBean;
@@ -56,6 +64,7 @@ public class DataInitSessionBean {
     }
 
     private void initializeData() {
+
         try {
             employeeSessionBeanLocal.createNewEmployee(new Employee("Employee", "1", "sysadmin", "password", EmployeeRoleEnum.SYSTEM_ADMIN));
             employeeSessionBeanLocal.createNewEmployee(new Employee("Employee", "2", "opmanager", "password", EmployeeRoleEnum.OPERATION));
@@ -79,7 +88,34 @@ public class DataInitSessionBean {
             roomRateSessionBean.createNewRoomRate(grandSuiteId, new RoomRate("Grand Suite Published", RoomRateTypeEnum.PUBLISHED, new BigDecimal("500")));
             roomRateSessionBean.createNewRoomRate(grandSuiteId, new RoomRate("Grand Suite Published", RoomRateTypeEnum.NORMAL, new BigDecimal("250")));
 
+            roomSessionBeanLocal.createNewRoom(deluxeRoomId, new Room("0101"));
+            roomSessionBeanLocal.createNewRoom(deluxeRoomId, new Room("0201"));
+            roomSessionBeanLocal.createNewRoom(deluxeRoomId, new Room("0301"));
+            roomSessionBeanLocal.createNewRoom(deluxeRoomId, new Room("0401"));
+            roomSessionBeanLocal.createNewRoom(deluxeRoomId, new Room("0501"));
+            roomSessionBeanLocal.createNewRoom(premierRoomId, new Room("0102"));
+            roomSessionBeanLocal.createNewRoom(premierRoomId, new Room("0202"));
+            roomSessionBeanLocal.createNewRoom(premierRoomId, new Room("0302"));
+            roomSessionBeanLocal.createNewRoom(premierRoomId, new Room("0402"));
+            roomSessionBeanLocal.createNewRoom(premierRoomId, new Room("0502"));
+            roomSessionBeanLocal.createNewRoom(familyRoomId, new Room("0103")); 
+            roomSessionBeanLocal.createNewRoom(familyRoomId, new Room("0203"));
+            roomSessionBeanLocal.createNewRoom(familyRoomId, new Room("0303"));
+            roomSessionBeanLocal.createNewRoom(familyRoomId, new Room("0403"));
+            roomSessionBeanLocal.createNewRoom(familyRoomId, new Room("0503"));
+            roomSessionBeanLocal.createNewRoom(juniorSuiteId, new Room("0104"));
+            roomSessionBeanLocal.createNewRoom(juniorSuiteId, new Room("0204"));
+            roomSessionBeanLocal.createNewRoom(juniorSuiteId, new Room("0304"));
+            roomSessionBeanLocal.createNewRoom(juniorSuiteId, new Room("0404"));
+            roomSessionBeanLocal.createNewRoom(juniorSuiteId, new Room("0504"));
+            roomSessionBeanLocal.createNewRoom(grandSuiteId, new Room("0105"));
+            roomSessionBeanLocal.createNewRoom(grandSuiteId, new Room("0205"));
+            roomSessionBeanLocal.createNewRoom(grandSuiteId, new Room("0305"));
+            roomSessionBeanLocal.createNewRoom(grandSuiteId, new Room("0405"));
+            roomSessionBeanLocal.createNewRoom(grandSuiteId, new Room("0505"));
+            
         } catch (EmployeeUsernameExistException | UnknownPersistenceException | InputDataValidationException | RoomTypeExistException | RoomTypeNotFoundException ex) {
+
             ex.printStackTrace();
         }
     }
