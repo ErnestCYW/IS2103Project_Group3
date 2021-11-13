@@ -14,6 +14,8 @@ import entity.RoomRate;
 import entity.RoomType;
 import java.math.BigDecimal;
 import entity.Room;
+import java.util.ArrayList;
+import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Singleton;
@@ -70,11 +72,17 @@ public class DataInitSessionBean {
             employeeSessionBeanLocal.createNewEmployee(new Employee("Employee", "3", "salesmanager", "password", EmployeeRoleEnum.SALES));
             employeeSessionBeanLocal.createNewEmployee(new Employee("Employee", "4", "guestrelo", "password", EmployeeRoleEnum.GUEST_RELATION));
 
-            Long deluxeRoomId = roomTypeSessionBean.createNewRoomType(new RoomType("Deluxe Room", "A Nice Room", "Small", "Single", 2, "Premier Room")).getRoomTypeId();
-            Long premierRoomId = roomTypeSessionBean.createNewRoomType(new RoomType("Premier Room", "A Nicer Room", "Medium", "Super Single", 2, "Family Room")).getRoomTypeId();
-            Long familyRoomId = roomTypeSessionBean.createNewRoomType(new RoomType("Family Room", "An Even Nicer Room", "Large", "Queen", 4, "Junior Suite")).getRoomTypeId();
-            Long juniorSuiteId = roomTypeSessionBean.createNewRoomType(new RoomType("Junior Suite", "An Almost Nicest Room", "Huge", "King", 4, "Grand Suite")).getRoomTypeId();
-            Long grandSuiteId = roomTypeSessionBean.createNewRoomType(new RoomType("Grand Suite", "THE NICEST ROOM", "ENORMOUS", "SUPER KING", 8)).getRoomTypeId();
+            List<String> amenities = new ArrayList<>();
+            amenities.add("Bath");
+            Long deluxeRoomId = roomTypeSessionBean.createNewRoomType(new RoomType("Deluxe Room", "A Nice Room", "Small", "Single", 2, amenities, "Premier Room")).getRoomTypeId();
+            amenities.add("Rain Shower");
+            Long premierRoomId = roomTypeSessionBean.createNewRoomType(new RoomType("Premier Room", "A Nicer Room", "Medium", "Super Single", 2, amenities, "Family Room")).getRoomTypeId();
+            amenities.add("Karaoke");
+            Long familyRoomId = roomTypeSessionBean.createNewRoomType(new RoomType("Family Room", "An Even Nicer Room", "Large", "Queen", 4, amenities, "Junior Suite")).getRoomTypeId();
+            amenities.add("Pool Table");
+            Long juniorSuiteId = roomTypeSessionBean.createNewRoomType(new RoomType("Junior Suite", "An Almost Nicest Room", "Huge", "King", 4, amenities, "Grand Suite")).getRoomTypeId();
+            amenities.add("Hot Tub");
+            Long grandSuiteId = roomTypeSessionBean.createNewRoomType(new RoomType("Grand Suite", "THE NICEST ROOM", "ENORMOUS", "SUPER KING", 8, amenities)).getRoomTypeId();
 
             roomRateSessionBean.createNewRoomRate(deluxeRoomId, new RoomRate("Deluxe Room Published", RoomRateTypeEnum.PUBLISHED, new BigDecimal("100")));
             roomRateSessionBean.createNewRoomRate(deluxeRoomId, new RoomRate("Deluxe Room Normal", RoomRateTypeEnum.NORMAL, new BigDecimal("50")));

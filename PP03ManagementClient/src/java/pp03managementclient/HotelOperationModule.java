@@ -18,6 +18,7 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
@@ -147,6 +148,21 @@ public class HotelOperationModule {
         newRoomType.setBed(scanner.nextLine().trim());
         System.out.print("Enter Capacity> ");
         newRoomType.setCapacity(scanner.nextInt());
+        
+        scanner.nextLine();
+        List<String> amenities = new ArrayList<>();
+        while (true) {
+
+            System.out.print("Enter Amenities (Enter q When Done) > ");
+            String amenity = scanner.nextLine().trim();
+            if (amenity.equals("q")) {
+                break;
+            } else {
+                amenities.add(amenity);
+            }
+
+        }
+        newRoomType.setAmenities(amenities);
 
         try {
             RoomType createdRoomType = roomTypeSessionBeanRemote.createNewRoomType(newRoomType);
@@ -169,8 +185,8 @@ public class HotelOperationModule {
 
         try {
             RoomType roomType = roomTypeSessionBeanRemote.viewRoomTypeDetails(roomTypeId);
-            System.out.printf("%8s%20s%20s%15s%20s%10s%10s\n", "Room Type ID", "Name", "Description", "Size", "Bed", "Capacity", "Disabled");
-            System.out.printf("%8s%20s%20s%15s%20s%10s%10s\n", roomType.getRoomTypeId(), roomType.getName(), roomType.getDescription(), roomType.getSize(), roomType.getBed(), roomType.getCapacity(), printDisabled(roomType.isDisabled()));
+            System.out.printf("%8s%20s%20s%15s%20s%10s%10s\n", "Room Type ID", "Name", "Description", "Size", "Bed", "Capacity", "Number Amenities", "Disabled");
+            System.out.printf("%8s%20s%20s%15s%20s%10s%10s\n", roomType.getRoomTypeId(), roomType.getName(), roomType.getDescription(), roomType.getSize(), roomType.getBed(), roomType.getCapacity(), roomType.getAmenities(), printDisabled(roomType.isDisabled()));
             System.out.println("------------------------");
             System.out.println("1: Update Room Type");
             System.out.println("2: Delete Room Type");
@@ -223,6 +239,21 @@ public class HotelOperationModule {
         if (inputInt >= 0) {
             roomType.setCapacity(inputInt);
         }
+        
+        scanner.nextLine();
+        List<String> amenities = new ArrayList<>();
+        while (true) {
+
+            System.out.print("Enter Amenities (Enter q When Done) > ");
+            String amenity = scanner.nextLine().trim();
+            if (amenity.equals("q")) {
+                break;
+            } else {
+                amenities.add(amenity);
+            }
+
+        }
+        roomType.setAmenities(amenities);
 
         Set<ConstraintViolation<RoomType>> constraintViolations = validator.validate(roomType);
 
