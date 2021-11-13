@@ -7,7 +7,9 @@ package ejb.session.stateless;
 
 import entity.Employee;
 import entity.Guest;
+import entity.Reservation;
 import java.util.List;
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -19,6 +21,7 @@ import util.exception.EmployeeNotFoundException;
 import util.exception.GuestEmailExistException;
 import util.exception.GuestNotFoundException;
 import util.exception.InvalidLoginCredentialException;
+import util.exception.ReservationNotFoundException;
 import util.exception.UnknownPersistenceException;
 
 /**
@@ -28,10 +31,13 @@ import util.exception.UnknownPersistenceException;
 @Stateless
 public class GuestSessionBean implements GuestSessionBeanRemote, GuestSessionBeanLocal {
 
+    @EJB
+    private ReservationSessionBeanLocal reservationSessionBean;
+
     @PersistenceContext(unitName = "PP03-ejbPU")
     private EntityManager em;
-
     
+        
     @Override
     public Long createNewGuest(Guest newGuest) throws GuestEmailExistException, UnknownPersistenceException
     {
@@ -131,5 +137,24 @@ public class GuestSessionBean implements GuestSessionBeanRemote, GuestSessionBea
         }
     }
 
+    @Override
+    public Reservation viewGuestReservation(long reservationId, Guest guest) throws ReservationNotFoundException, InvalidLoginCredentialException {
+        
+        Reservation reservation = reservationSessionBean.viewReservation(reservationId);
+        
+        if (reservation.getGuest().equals(guest)) {
+            return reservation;
+        } else {
+            throw new InvalidLoginCredentialException("Reservation does not exist or does not belong to you");
+        }
+        
+    }
+    
+    @Override
+    public List<Reservation> viewGuestReservations(Guest guest) {
+        
+        return guest.getReservations();
+    
+    }
     
 }

@@ -132,6 +132,7 @@ public class BookingReservationSessionBean implements BookingReservationSessionB
         return totalPrice;
     }
 
+    @Override
     public Double getOnlinePriceForRoomType(RoomType roomType, Date checkinDate, Date checkoutDate) throws CannotGetOnlinePriceException {
 
         Double totalPrice = 0.0;
@@ -246,6 +247,7 @@ public class BookingReservationSessionBean implements BookingReservationSessionB
         }
     }
 
+    @Override
      public List<Long> onlineReserveRoom(String roomTypeName, Integer numOfRoomsToReserve, Date checkinDate, Date checkoutDate, Guest loggedInGuest) throws ReserveRoomException {
      
         try {

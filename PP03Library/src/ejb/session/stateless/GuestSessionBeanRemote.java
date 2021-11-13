@@ -6,11 +6,13 @@
 package ejb.session.stateless;
 
 import entity.Guest;
+import entity.Reservation;
 import java.util.List;
 import javax.ejb.Remote;
 import util.exception.GuestEmailExistException;
 import util.exception.GuestNotFoundException;
 import util.exception.InvalidLoginCredentialException;
+import util.exception.ReservationNotFoundException;
 import util.exception.UnknownPersistenceException;
 
 /**
@@ -29,4 +31,9 @@ public interface GuestSessionBeanRemote {
     public Guest retrieveGuestByEmail(String email) throws GuestNotFoundException;
     
     public Guest guestLogin(String email, String password) throws InvalidLoginCredentialException;
+    
+    public Reservation viewGuestReservation(long reservationId, Guest guest) throws ReservationNotFoundException, InvalidLoginCredentialException;
+
+    public List<Reservation> viewGuestReservations(Guest guest);
+
 }
