@@ -114,7 +114,11 @@ public class AllocationSessionBean implements AllocationSessionBeanRemote, Alloc
                         + "WHERE r.status = util.enumeration.RoomStatusEnum.AVAILABLE "
                         + "AND r.roomType = :inRoomType "
                         + "AND NOT r.disabled");
-                availableDifferentTypeRoomsQuery.setParameter("inRoomType", roomType.getNextHigherRoomType());
+                try {
+                availableDifferentTypeRoomsQuery.setParameter("inRoomType", roomTypeSessionBean.retrieveRoomTypeByName(roomType.getNextHigherRoomType()));
+                } catch (RoomTypeNotFoundException ex) {
+                    break;
+                }
                 List<Room> temp2 = availableDifferentTypeRoomsQuery.setMaxResults(1).getResultList();
 
                 if (!temp2.isEmpty()) {
@@ -125,8 +129,8 @@ public class AllocationSessionBean implements AllocationSessionBeanRemote, Alloc
                     availableDifferentTypeRoom.setStatus(RoomStatusEnum.UNAVAILABLE);
 
                     String notificationMessage = "Reservation ID: " + reservation.getReservationId() + " has been upgraded from "
-                            + reservation.getRoomType() + " to room: " + availableDifferentTypeRoom.getNumber()
-                            + " of type: " + availableDifferentTypeRoom.getRoomType();
+                            + reservation.getRoomType().getName() + " to room: " + availableDifferentTypeRoom.getNumber()
+                            + " of type: " + availableDifferentTypeRoom.getRoomType().getName();
                     roomAllocationReport.getNoAvailableRoomUpgrade().add(notificationMessage);
 
                     return availableDifferentTypeRoom;

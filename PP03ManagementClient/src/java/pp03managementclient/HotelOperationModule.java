@@ -374,7 +374,7 @@ public class HotelOperationModule {
         Integer inputInt;
 
         System.out.println("*** Update Room Details ***\n");
-        System.out.print("Enter Room Number (blank if no change)> ");
+        System.out.print("Enter Room Number> ");
 
         try {
             Room room = roomSessionBeanRemote.retrieveRoomByRoomNumber(scanner.nextLine().trim());

@@ -6,6 +6,7 @@
 package ejb.session.stateful;
 
 import entity.Guest;
+import entity.Partner;
 import entity.Room;
 import entity.RoomType;
 import java.math.BigDecimal;
@@ -46,5 +47,7 @@ public interface BookingReservationSessionBeanLocal {
     public HashMap<String, Integer> getSearchRoomResults();
 
     public HashMap<String, BigDecimal> getRoomTypeNameAndTotalPrice();
+
+    public List<Long> onlineReserveRoomPartner(String roomTypeName, Integer numOfRoomsToReserve, Date checkinDate, Date checkoutDate, Partner loggedInPartner) throws ReserveRoomException;
     
 }

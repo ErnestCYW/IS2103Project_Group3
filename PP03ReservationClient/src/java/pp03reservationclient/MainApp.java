@@ -152,20 +152,8 @@ public class MainApp {
                     doSearchHotelRoom();
                 } else if (response == 2) {
                     doViewMyReservationDetails();
-                    System.out.println("*** HoRS Reservation System ***\n");
-                    System.out.println("You are login as " + loggedInGuest.getEmail() + "\n");
-                    System.out.println("1: Search Hotel Room");
-                    System.out.println("2: View My Reservation Details");
-                    System.out.println("3: View All My Reservation Details");
-                    System.out.println("4: Logout\n");
                 } else if (response == 3) {
                     doViewAllMyReservationDetails();
-                    System.out.println("*** HoRS Reservation System ***\n");
-                    System.out.println("You are login as " + loggedInGuest.getEmail() + "\n");
-                    System.out.println("1: Search Hotel Room");
-                    System.out.println("2: View My Reservation Details");
-                    System.out.println("3: View All My Reservation Details");
-                    System.out.println("4: Logout\n");
                 } else if (response == 4) {
                     break;
                 } else {

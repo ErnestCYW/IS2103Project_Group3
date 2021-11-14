@@ -67,25 +67,10 @@ public class FrontOfficeModule {
 
                 if (response == 1) {
                     doSearchRoom();
-                    System.out.println("*** HoRS Management System :: Front Office ***\n");
-                    System.out.println("1: Walk-in Search Room");
-                    System.out.println("2: Checkin Guest");
-                    System.out.println("3: Checkout Guest");
-                    System.out.println("4: Back\n");
                 } else if (response == 2) {
                     doCheckinGuest();
-                    System.out.println("*** HoRS Management System :: Front Office ***\n");
-                    System.out.println("1: Walk-in Search Room");
-                    System.out.println("2: Checkin Guest");
-                    System.out.println("3: Checkout Guest");
-                    System.out.println("4: Back\n");
                 } else if (response == 3) {
                     doCheckoutGuest();
-                    System.out.println("*** HoRS Management System :: Front Office ***\n");
-                    System.out.println("1: Walk-in Search Room");
-                    System.out.println("2: Checkin Guest");
-                    System.out.println("3: Checkout Guest");
-                    System.out.println("4: Back\n");
                 } else if (response == 4) {
                     break;
                 } else {
@@ -186,6 +171,7 @@ public class FrontOfficeModule {
             for (Room room : rooms) {
                 System.out.println("Room > " + room.getNumber());
             }
+            System.out.println("");
         } catch (CheckinGuestException ex) {
             System.out.println(ex.getMessage() + "\n");
         }

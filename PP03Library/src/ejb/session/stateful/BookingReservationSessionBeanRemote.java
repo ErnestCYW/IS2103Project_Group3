@@ -6,6 +6,7 @@
 package ejb.session.stateful;
 
 import entity.Guest;
+import entity.Partner;
 import entity.Room;
 import entity.RoomType;
 import java.math.BigDecimal;
@@ -26,24 +27,26 @@ import util.exception.RoomTypeNotFoundException;
  */
 @Remote
 public interface BookingReservationSessionBeanRemote {
-    
+
     public Integer getNumOfAvailableRoomsForRoomType(Long roomTypeId, Date checkinDate, Date checkoutDate) throws RoomTypeNotFoundException;
-    
-    public Double getWalkInPriceForRoomType(RoomType roomType, Date checkinDate, Date checkoutDate)throws CannotGetWalkInPriceException;
-    
+
+    public Double getWalkInPriceForRoomType(RoomType roomType, Date checkinDate, Date checkoutDate) throws CannotGetWalkInPriceException;
+
     public void saveSearchResults(String roomTypeName, Integer numOfAvailablerooms);
-    
+
     public List<Long> walkInReserveRoom(String roomTypeName, Integer numOfRoomsToReserve, Date checkinDate, Date checkoutDate) throws ReserveRoomException;
-    
+
     public List<Room> checkinGuest(Long guestId) throws CheckinGuestException;
-    
+
     public List<Room> checkoutGuest(Long guestId) throws CheckoutGuestException;
-    
+
     public Double getOnlinePriceForRoomType(RoomType roomType, Date checkinDate, Date checkoutDate) throws CannotGetOnlinePriceException;
 
-    public List<Long> onlineReserveRoom(String roomTypeName, Integer numOfRoomsToReserve, Date checkinDate, Date checkoutDate, Guest loggedInGuest) throws ReserveRoomException;    
-    
+    public List<Long> onlineReserveRoom(String roomTypeName, Integer numOfRoomsToReserve, Date checkinDate, Date checkoutDate, Guest loggedInGuest) throws ReserveRoomException;
+
     public HashMap<String, Integer> getSearchRoomResults();
 
     public HashMap<String, BigDecimal> getRoomTypeNameAndTotalPrice();
+
+    public List<Long> onlineReserveRoomPartner(String roomTypeName, Integer numOfRoomsToReserve, Date checkinDate, Date checkoutDate, Partner loggedInPartner) throws ReserveRoomException;
 }

@@ -8,12 +8,14 @@ package ejb.session.stateful;
 import ejb.session.stateless.AllocationSessionBeanLocal;
 import ejb.session.stateless.GuestSessionBeanLocal;
 import ejb.session.stateless.HandleDateTimeSessionBeanLocal;
+import ejb.session.stateless.PartnerSessionBeanLocal;
 import ejb.session.stateless.ReservationSessionBeanLocal;
 import ejb.session.stateless.RoomAllocationReportSessionBeanLocal;
 import ejb.session.stateless.RoomRateSessionBeanLocal;
 import ejb.session.stateless.RoomSessionBeanLocal;
 import ejb.session.stateless.RoomTypeSessionBeanLocal;
 import entity.Guest;
+import entity.Partner;
 import entity.Reservation;
 import entity.Room;
 import entity.RoomRate;
@@ -41,6 +43,7 @@ import util.exception.CheckoutGuestException;
 import util.exception.GuestEmailExistException;
 import util.exception.GuestNotFoundException;
 import util.exception.InputDataValidationException;
+import util.exception.PartnerNotFoundException;
 import util.exception.ReserveRoomException;
 import util.exception.RoomAllocationReportNotFoundException;
 import util.exception.RoomTypeNotFoundException;
@@ -50,7 +53,10 @@ import util.exception.UnknownPersistenceException;
 public class BookingReservationSessionBean implements BookingReservationSessionBeanRemote, BookingReservationSessionBeanLocal {
 
     @EJB
-    private RoomAllocationReportSessionBeanLocal roomAllocationReportSessionBean;
+    private PartnerSessionBeanLocal partnerSessionBeanLocal;
+
+    @EJB
+    private RoomAllocationReportSessionBeanLocal roomAllocationReportSessionBeanLocal;
 
     @EJB
     private RoomRateSessionBeanLocal roomRateSessionBeanLocal;
@@ -258,8 +264,8 @@ public class BookingReservationSessionBean implements BookingReservationSessionB
 
                         //Allocate Room If It Is Past 2AM On Checkin Day
                         if (handleDateTimeSessionBean.isToday(checkinDate) & handleDateTimeSessionBean.isPassed2AM()) {
-                            
-                            allocationSessionBean.allocateRoom(reservation, roomAllocationReportSessionBean.viewTodayRoomAllocationReport());
+
+                            allocationSessionBean.allocateRoom(reservation, roomAllocationReportSessionBeanLocal.viewTodayRoomAllocationReport());
 
                         }
 
@@ -340,7 +346,7 @@ public class BookingReservationSessionBean implements BookingReservationSessionB
                         //Allocate Room If It Is Past 2AM On Checkin Day
                         if (handleDateTimeSessionBean.isToday(checkinDate) & handleDateTimeSessionBean.isPassed2AM()) {
 
-                            allocationSessionBean.allocateRoom(reservation, roomAllocationReportSessionBean.viewTodayRoomAllocationReport());
+                            allocationSessionBean.allocateRoom(reservation, roomAllocationReportSessionBeanLocal.viewTodayRoomAllocationReport());
 
                         }
 
@@ -350,6 +356,87 @@ public class BookingReservationSessionBean implements BookingReservationSessionB
                     return reservationIds;
 
                 } catch (InputDataValidationException | UnknownPersistenceException | CannotGetTodayDateException | GuestNotFoundException | RoomAllocationReportNotFoundException ex) {
+
+                    throw new ReserveRoomException(ex.getMessage());
+
+                }
+
+            } else {
+
+                if (!searchRoomResults.containsKey(roomTypeName)) {
+
+                    throw new ReserveRoomException("Invalid Room Type");
+
+                } else {
+
+                    throw new ReserveRoomException("Not enough rooms");
+
+                }
+            }
+        } catch (RoomTypeNotFoundException ex) {
+
+            throw new ReserveRoomException("Invalid Room Type Entered");
+
+        }
+
+    }
+
+    @Override
+    public List<Long> onlineReserveRoomPartner(String roomTypeName, Integer numOfRoomsToReserve, Date checkinDate, Date checkoutDate, Partner loggedInPartner) throws ReserveRoomException {
+
+        try {
+
+            //Retrieve information stored in stateful session bean
+            Integer availableRooms = getSearchRoomResults().get(roomTypeName);
+            RoomType roomType = roomTypeSessionBean.retrieveRoomTypeByName(roomTypeName);
+            BigDecimal totalPrice = getRoomTypeNameAndTotalPrice().get(roomTypeName);
+
+            List<Long> reservationIds = new ArrayList<>();
+
+            //Check if room rate was just disabled after search
+            for (RoomRate roomRate : roomRatesForReservation) {
+                if (roomRate.isDisabled()) {
+                    throw new ReserveRoomException("A Room Rate for your specified Room Type has been diabled."
+                            + "Please search room again.");
+                }
+            }
+
+            //Confirm Input With Search Results
+            if (searchRoomResults.containsKey(roomTypeName) & numOfRoomsToReserve <= availableRooms) {
+
+                //Creating Reservation & Associating Room Type
+                try {
+
+                    for (int roomCount = 0; roomCount < numOfRoomsToReserve; roomCount++) {
+
+                        Reservation reservation = new Reservation(checkinDate, checkoutDate, totalPrice);
+
+                        //Associate Guest
+                        loggedInPartner = partnerSessionBeanLocal.retrievePartnerByPartnerId(loggedInPartner.getPartnerId());
+                        loggedInPartner.getReservations().size();
+                        reservation.setPartner(loggedInPartner);
+                        loggedInPartner.getReservations().add(reservation);
+
+                        //Associate Room Rate
+                        for (RoomRate roomRate : roomRatesForReservation) {
+                            roomRate.getReservations().add(reservation);
+                        }
+
+                        reservation = reservationSessionBean.createReservation(roomType.getRoomTypeId(), reservation);
+
+                        //Allocate Room If It Is Past 2AM On Checkin Day
+                        if (handleDateTimeSessionBean.isToday(checkinDate) & handleDateTimeSessionBean.isPassed2AM()) {
+
+                            allocationSessionBean.allocateRoom(reservation, roomAllocationReportSessionBeanLocal.viewTodayRoomAllocationReport());
+
+                        }
+
+                        reservationIds.add(reservation.getReservationId());
+                    }
+
+                    return reservationIds;
+
+                } catch (InputDataValidationException | UnknownPersistenceException | CannotGetTodayDateException | PartnerNotFoundException | RoomAllocationReportNotFoundException ex) {
 
                     throw new ReserveRoomException(ex.getMessage());
 
@@ -411,7 +498,7 @@ public class BookingReservationSessionBean implements BookingReservationSessionB
     //Can refactor with JPQL to improve complexity
     @Override
     public List<Room> checkoutGuest(Long guestId) throws CheckoutGuestException {
-        
+
         //Disassociate Room Rate (Guest reservations using this rate and has not passed)
         try {
             List<Reservation> guestReservations = guestSessionBeanLocal.viewGuestReservations(guestSessionBeanLocal.retrieveGuestByGuestId(guestId));

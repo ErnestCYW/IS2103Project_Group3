@@ -7,6 +7,7 @@ package ejb.session.stateless;
 
 import entity.Partner;
 import entity.Reservation;
+import java.util.ArrayList;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -146,13 +147,18 @@ public class PartnerSessionBean implements PartnerSessionBeanRemote, PartnerSess
         
     }
     
-   
-    
-    
+  
     @Override
     public List<Reservation> viewReservations(Partner partner) {
         
-        return partner.getReservations();
-    
+        try {
+            Partner managedPartner = retrievePartnerByPartnerId(partner.getPartnerId());
+            
+            managedPartner.getReservations().size();
+            List<Reservation> reservations = managedPartner.getReservations();
+        } catch (PartnerNotFoundException ex) {
+            ex.printStackTrace();
+        }
+        return new ArrayList<>();
     }
 }
