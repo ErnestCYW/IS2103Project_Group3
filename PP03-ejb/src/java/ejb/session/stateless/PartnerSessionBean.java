@@ -119,6 +119,7 @@ public class PartnerSessionBean implements PartnerSessionBeanRemote, PartnerSess
             
             if(partner.getPassword().equals(password))
             {
+                partner.getReservations().size();
                 return partner;
             }
             else
@@ -156,6 +157,8 @@ public class PartnerSessionBean implements PartnerSessionBeanRemote, PartnerSess
             
             managedPartner.getReservations().size();
             List<Reservation> reservations = managedPartner.getReservations();
+            
+            return reservations;
         } catch (PartnerNotFoundException ex) {
             ex.printStackTrace();
         }

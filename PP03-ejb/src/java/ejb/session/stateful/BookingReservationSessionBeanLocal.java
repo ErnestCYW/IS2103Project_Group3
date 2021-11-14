@@ -49,5 +49,7 @@ public interface BookingReservationSessionBeanLocal {
     public HashMap<String, BigDecimal> getRoomTypeNameAndTotalPrice();
 
     public List<Long> onlineReserveRoomPartner(String roomTypeName, Integer numOfRoomsToReserve, Date checkinDate, Date checkoutDate, Partner loggedInPartner) throws ReserveRoomException;
+
+    public void savePrice(String roomTypeName, BigDecimal price);
     
 }

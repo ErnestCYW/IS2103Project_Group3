@@ -6,16 +6,23 @@
 package ejb.session.singleton;
 
 import ejb.session.stateless.EmployeeSessionBeanLocal;
+import ejb.session.stateless.PartnerSessionBeanLocal;
+import ejb.session.stateless.ReservationSessionBeanLocal;
 import ejb.session.stateless.RoomAllocationReportSessionBeanLocal;
 import ejb.session.stateless.RoomRateSessionBeanLocal;
 import ejb.session.stateless.RoomTypeSessionBeanLocal;
 import ejb.session.stateless.RoomSessionBeanLocal;
 import entity.Employee;
+import entity.Partner;
+import entity.Reservation;
 import entity.RoomRate;
 import entity.RoomType;
 import java.math.BigDecimal;
 import entity.Room;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
@@ -28,6 +35,8 @@ import util.exception.CannotGetTodayDateException;
 import util.exception.EmployeeNotFoundException;
 import util.exception.EmployeeUsernameExistException;
 import util.exception.InputDataValidationException;
+import util.exception.PartnerNotFoundException;
+import util.exception.PartnerUsernameExistException;
 import util.exception.RoomTypeExistException;
 import util.exception.RoomTypeNotFoundException;
 import util.exception.UnknownPersistenceException;
@@ -40,7 +49,7 @@ import util.exception.UnknownPersistenceException;
 @LocalBean
 @Startup
 public class DataInitSessionBean {
-
+  
     @EJB
     private RoomAllocationReportSessionBeanLocal roomAllocationReportSessionBeanLocal;
 
@@ -55,6 +64,10 @@ public class DataInitSessionBean {
 
     @EJB
     private RoomRateSessionBeanLocal roomRateSessionBean;
+    
+    
+    
+    
 
     @PostConstruct
     public void postConstruct() {
@@ -123,6 +136,7 @@ public class DataInitSessionBean {
             roomSessionBeanLocal.createNewRoom(grandSuiteId, new Room("0505"));
             
             roomAllocationReportSessionBeanLocal.createRoomAllocationReport();
+           
             
         } catch (EmployeeUsernameExistException | UnknownPersistenceException | InputDataValidationException | RoomTypeExistException | RoomTypeNotFoundException | CannotGetTodayDateException ex) {
 

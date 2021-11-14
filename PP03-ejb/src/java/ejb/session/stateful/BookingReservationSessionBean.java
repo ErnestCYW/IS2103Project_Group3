@@ -466,6 +466,12 @@ public class BookingReservationSessionBean implements BookingReservationSessionB
     public void saveSearchResults(String roomTypeName, Integer numOfAvailablerooms) {
         getSearchRoomResults().put(roomTypeName, numOfAvailablerooms);
     }
+    
+    
+    @Override
+    public void savePrice(String roomTypeName, BigDecimal price) {
+        roomTypeNameAndTotalPrice.put(roomTypeName, price);
+    }
 
     //Can refactor with JPQL to improve complexity
     @Override
