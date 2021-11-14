@@ -12,7 +12,9 @@ import ejb.session.stateless.PartnerSessionBeanRemote;
 import ejb.session.stateless.RoomRateSessionBeanRemote;
 import ejb.session.stateless.RoomSessionBeanRemote;
 import ejb.session.stateless.RoomTypeSessionBeanRemote;
+import ejb.session.stateless.RoomAllocationReportSessionBeanRemote;
 import entity.Employee;
+import entity.RoomAllocationReport;
 import java.util.Scanner;
 import util.exception.InvalidEmployeeRoleException;
 import util.exception.InvalidLoginCredentialException;
@@ -29,6 +31,7 @@ public class MainApp {
     private RoomTypeSessionBeanRemote roomTypeSessionBeanRemote;
     private BookingReservationSessionBeanRemote bookingReservationSessionBeanRemote;
     private HandleDateTimeSessionBeanRemote handleDateTimeSessionBeanRemote;
+    private RoomAllocationReportSessionBeanRemote roomAllocationReportSessionBeanRemote;
 
     private SystemAdministrationModule systemAdministrationModule;
     private HotelOperationModule hotelOperationModule;
@@ -39,7 +42,7 @@ public class MainApp {
     public MainApp() {
     }
 
-    public MainApp(EmployeeSessionBeanRemote employeeSessionBeanRemote, PartnerSessionBeanRemote partnerSessionBeanRemote, RoomSessionBeanRemote roomSessionBeanRemote, RoomRateSessionBeanRemote roomRateSessionBeanRemote, RoomTypeSessionBeanRemote roomTypeSessionBeanRemote, BookingReservationSessionBeanRemote bookingReservationSessionBeanRemote, HandleDateTimeSessionBeanRemote handleDateTimeSessionBeanRemote) {
+    public MainApp(EmployeeSessionBeanRemote employeeSessionBeanRemote, PartnerSessionBeanRemote partnerSessionBeanRemote, RoomSessionBeanRemote roomSessionBeanRemote, RoomRateSessionBeanRemote roomRateSessionBeanRemote, RoomTypeSessionBeanRemote roomTypeSessionBeanRemote, BookingReservationSessionBeanRemote bookingReservationSessionBeanRemote, HandleDateTimeSessionBeanRemote handleDateTimeSessionBeanRemote, RoomAllocationReportSessionBeanRemote roomAllocationReportSessionBeanRemote) {
         this.employeeSessionBeanRemote = employeeSessionBeanRemote;
         this.partnerSessionBeanRemote = partnerSessionBeanRemote;
         this.roomSessionBeanRemote = roomSessionBeanRemote;

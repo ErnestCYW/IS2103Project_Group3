@@ -12,6 +12,7 @@ import entity.RoomType;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Schedule;
+import javax.ejb.Schedules;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -41,8 +42,11 @@ public class AllocationSessionBean implements AllocationSessionBeanRemote, Alloc
 
     // Add business logic below. (Right-click in editor and choose
     // "Insert Code > Add Business Method")
-    @Schedule(hour = "2")
-    @Override
+    
+    @Schedules({
+        @Schedule(dayOfWeek="*"),
+        @Schedule(hour="2")
+    })
     public void allocateRoomToCurrentDayReservations() throws CannotGetTodayDateException {
 
         roomAllocationReportSessionBean.createRoomAllocationReport();
@@ -56,6 +60,14 @@ public class AllocationSessionBean implements AllocationSessionBeanRemote, Alloc
         }
 
     }
+    
+    public void allocateRoomByDay(Date day) {
+        
+        try{
+            roomAllocationReportSessionBean.createRoomAllocationReport();
+        } catch ()
+        
+    }
 
     @Override
     public Room allocateRoom(Reservation reservation) throws CannotGetTodayDateException {
@@ -67,10 +79,11 @@ public class AllocationSessionBean implements AllocationSessionBeanRemote, Alloc
                 + "AND r.roomType = :inRoomType "
                 + "AND NOT r.disabled");
         availableSameTypeRoomsQuery.setParameter("inRoomType", roomType);
-        List<Room> temp = availableSameTypeRoomsQuery.setMaxResults(1).getResultList();
-        Room availableSameTypeRoom = temp.get(0);
+        List<Room> temp1 = availableSameTypeRoomsQuery.setMaxResults(1).getResultList();
 
-        if (availableSameTypeRoom != null) {
+        if (!temp1.isEmpty()) {
+            
+            Room availableSameTypeRoom = temp1.get(0);
 
             availableSameTypeRoom.setCurrentReservation(reservation);
             availableSameTypeRoom.setStatus(RoomStatusEnum.UNAVAILABLE);
@@ -89,9 +102,11 @@ public class AllocationSessionBean implements AllocationSessionBeanRemote, Alloc
                         + "AND r.roomType = :inRoomType "
                         + "AND NOT r.disabled");
                 availableDifferentTypeRoomsQuery.setParameter("inRoomType", roomType.getNextHigherRoomType());
-                Room availableDifferentTypeRoom = (Room) availableDifferentTypeRoomsQuery.setMaxResults(1).getResultList();
+                List<Room> temp2 = availableDifferentTypeRoomsQuery.setMaxResults(1).getResultList();
 
-                if (availableDifferentTypeRoom != null) {
+                if (!temp2.isEmpty()) {
+                    
+                    Room availableDifferentTypeRoom = temp2.get(0);
 
                     availableDifferentTypeRoom.setCurrentReservation(reservation);
                     availableDifferentTypeRoom.setStatus(RoomStatusEnum.UNAVAILABLE);
@@ -125,11 +140,6 @@ public class AllocationSessionBean implements AllocationSessionBeanRemote, Alloc
             
         }
 
-    }
-
-    @Override
-    public RoomAllocationReport viewRoomAllocationReport() throws CannotGetTodayDateException {
-        return roomAllocationReportSessionBean.viewRoomAllocationReportByDate(handleDateTimeSessionBean.getTodayDate());
     }
 
 }

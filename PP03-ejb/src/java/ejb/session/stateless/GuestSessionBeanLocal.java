@@ -32,7 +32,6 @@ public interface GuestSessionBeanLocal {
 
     public Guest guestLogin(String email, String password) throws InvalidLoginCredentialException;
 
-
     public List<Reservation> viewGuestReservations(Guest guest);
 
     public Reservation viewGuestReservation(Long reservationId, Guest guest) throws ReservationNotFoundException, InvalidLoginCredentialException;

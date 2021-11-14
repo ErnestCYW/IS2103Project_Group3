@@ -16,6 +16,7 @@ import javax.ejb.Local;
 import util.exception.CannotGetOnlinePriceException;
 import util.exception.CannotGetWalkInPriceException;
 import util.exception.CheckinGuestException;
+import util.exception.CheckoutGuestException;
 import util.exception.ReserveRoomException;
 import util.exception.RoomTypeNotFoundException;
 
@@ -36,7 +37,7 @@ public interface BookingReservationSessionBeanLocal {
 
     public List<Room> checkinGuest(Long guestId) throws CheckinGuestException;
 
-    public void checkoutGuest(Long guestId);
+    public List<Room> checkoutGuest(Long guestId) throws CheckoutGuestException;
 
     public Double getOnlinePriceForRoomType(RoomType roomType, Date checkinDate, Date checkoutDate) throws CannotGetOnlinePriceException;
 

@@ -5,10 +5,11 @@
  */
 package ejb.session.stateless;
 
-import entity.Employee;
 import entity.Guest;
 import entity.Reservation;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -17,7 +18,6 @@ import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
-import util.exception.EmployeeNotFoundException;
 import util.exception.GuestEmailExistException;
 import util.exception.GuestNotFoundException;
 import util.exception.InvalidLoginCredentialException;
@@ -36,7 +36,6 @@ public class GuestSessionBean implements GuestSessionBeanRemote, GuestSessionBea
 
     @PersistenceContext(unitName = "PP03-ejbPU")
     private EntityManager em;
-    
         
     @Override
     public Long createNewGuest(Guest newGuest) throws GuestEmailExistException, UnknownPersistenceException
@@ -67,8 +66,6 @@ public class GuestSessionBean implements GuestSessionBeanRemote, GuestSessionBea
             }
         }
     }
-    
-    
     
     @Override
     public List<Guest> retrieveAllGuest()
@@ -150,7 +147,7 @@ public class GuestSessionBean implements GuestSessionBeanRemote, GuestSessionBea
         if (reservation.getGuest().equals(guest)) {
             return reservation;
         } else {
-            throw new InvalidLoginCredentialException("Reservation does not exist or does not belong to you");
+            throw new InvalidLoginCredentialException("Reservation does not belong to you");
         }
         
     }
@@ -158,6 +155,11 @@ public class GuestSessionBean implements GuestSessionBeanRemote, GuestSessionBea
     @Override
     public List<Reservation> viewGuestReservations(Guest guest) {
         
+        try {
+            Guest managedGuest = retrieveGuestByGuestId(guest.getGuestId());
+        } catch (GuestNotFoundException ex) {
+            ex.printStackTrace();
+        }
         return guest.getReservations();
     
     }

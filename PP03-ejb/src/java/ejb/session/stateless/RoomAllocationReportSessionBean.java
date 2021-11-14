@@ -7,6 +7,7 @@ package ejb.session.stateless;
 
 import entity.RoomAllocationReport;
 import java.util.Date;
+import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -39,6 +40,17 @@ public class RoomAllocationReportSessionBean implements RoomAllocationReportSess
         
         return newRoomAllocationReportEntity;
     }
+    
+    @Override
+    public RoomAllocationReport createRoomAllocationReport() throws CannotGetTodayDateException{
+        
+        RoomAllocationReport newRoomAllocationReportEntity = new RoomAllocationReport(handleDateTimeSessionBean.getTodayDate());
+        
+        em.persist(newRoomAllocationReportEntity);
+        em.flush();
+        
+        return newRoomAllocationReportEntity;
+    }
 
     @Override
     public RoomAllocationReport viewRoomAllocationReportByDate(Date date) {
@@ -51,11 +63,24 @@ public class RoomAllocationReportSessionBean implements RoomAllocationReportSess
     }
     
     @Override
-    public RoomAllocationReport viewRoomAllocationReport(Long roomAllocationReportId) {
+    public RoomAllocationReport viewRoomAllocationReportById(Long roomAllocationReportId) {
         
         RoomAllocationReport roomAllocationReport = em.find(RoomAllocationReport.class, roomAllocationReportId);
         
         return roomAllocationReport;
+    }
+    
+    @Override
+    public RoomAllocationReport viewTodayRoomAllocationReport() throws CannotGetTodayDateException {
+        return viewRoomAllocationReportByDate(handleDateTimeSessionBean.getTodayDate());
+    }
+    
+    @Override
+    public List<RoomAllocationReport> viewAllRoomAllocationReports() {
+        
+        Query query = em.createQuery("SELECT rar FROM RoomAllocationReport rar");
+        
+        return query.getResultList();
     }
 
     @Override

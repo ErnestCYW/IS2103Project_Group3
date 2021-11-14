@@ -9,6 +9,7 @@ import ejb.session.stateful.BookingReservationSessionBeanRemote;
 import ejb.session.stateless.EmployeeSessionBeanRemote;
 import ejb.session.stateless.HandleDateTimeSessionBeanRemote;
 import ejb.session.stateless.PartnerSessionBeanRemote;
+import ejb.session.stateless.RoomAllocationReportSessionBeanRemote;
 import ejb.session.stateless.RoomRateSessionBeanRemote;
 import ejb.session.stateless.RoomSessionBeanRemote;
 import ejb.session.stateless.RoomTypeSessionBeanRemote;
@@ -19,6 +20,9 @@ import javax.ejb.EJB;
  * @author ernestcyw
  */
 public class Main {
+
+    @EJB
+    private static RoomAllocationReportSessionBeanRemote roomAllocationReportSessionBeanRemote;
 
     @EJB
     private static HandleDateTimeSessionBeanRemote handleDateTimeSessionBeanRemote;
@@ -50,7 +54,7 @@ public class Main {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        MainApp mainApp = new MainApp(employeeSessionBeanRemote, partnerSessionBeanRemote, roomSessionBeanRemote, roomRateSessionBeanRemote, roomTypeSessionBeanRemote, bookingReservationSessionBeanRemote, handleDateTimeSessionBeanRemote);
+        MainApp mainApp = new MainApp(employeeSessionBeanRemote, partnerSessionBeanRemote, roomSessionBeanRemote, roomRateSessionBeanRemote, roomTypeSessionBeanRemote, bookingReservationSessionBeanRemote, handleDateTimeSessionBeanRemote, roomAllocationReportSessionBeanRemote);
         mainApp.runApp();
     }
     

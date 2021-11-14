@@ -17,7 +17,6 @@ import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.ArrayList;
 import java.util.List;
@@ -89,6 +88,7 @@ public class HotelOperationModule {
             System.out.println("7: View All Rooms");
             System.out.println("8: View Room Allocation Exception Report");
             System.out.println("9: Create New Room Rate");
+            System.out.println("9: Create New Room Rate");
             System.out.println("10: View Room Rate Details");
             System.out.println("11: View All Room Rates");
             System.out.println("12: Back\n");
@@ -114,7 +114,7 @@ public class HotelOperationModule {
                 } else if (response == 7) {
                     doViewAllRooms();
                 } else if (response == 8) {
-                    //doViewRoomAllocationReport();
+                    doViewRoomAllocationReport();
                 } else if (response == 9) {
                     doCreateNewRoomRate();
                 } else if (response == 10) {
@@ -149,7 +149,7 @@ public class HotelOperationModule {
         newRoomType.setBed(scanner.nextLine().trim());
         System.out.print("Enter Capacity> ");
         newRoomType.setCapacity(scanner.nextInt());
-        
+
         scanner.nextLine();
         List<String> amenities = new ArrayList<>();
         while (true) {
@@ -164,11 +164,10 @@ public class HotelOperationModule {
 
         }
         newRoomType.setAmenities(amenities);
-        
+
         System.out.print("Enter Next Higher Room Type (If None, Enter 'blank') > ");
         String nextHigherRoomType = scanner.nextLine().trim();
-        if(nextHigherRoomType.length() > 0)
-        {
+        if (nextHigherRoomType.length() > 0) {
             newRoomType.setNextHigherRoomType(nextHigherRoomType);
         }
 
@@ -247,7 +246,7 @@ public class HotelOperationModule {
         if (inputInt >= 0) {
             roomType.setCapacity(inputInt);
         }
-        
+
         scanner.nextLine();
         List<String> amenities = new ArrayList<>();
         while (true) {
@@ -268,7 +267,7 @@ public class HotelOperationModule {
         if (constraintViolations.isEmpty()) {
             try {
                 roomTypeSessionBeanRemote.updateRoomType(roomType);
-                System.out.println("Staff updated successfully!\n");
+                System.out.println("Room Type updated successfully!\n");
             } catch (RoomTypeNotFoundException | RoomTypeExistException | UnknownPersistenceException ex) {
                 System.out.println(ex.getMessage() + "\n");
             } catch (InputDataValidationException ex) {
@@ -365,6 +364,7 @@ public class HotelOperationModule {
             while (true) {
                 System.out.print("Select Room Availability (1: Available, 2: Unavailable)> ");
                 inputInt = scanner.nextInt();
+                scanner.nextLine();
                 //Integer previousRoomRateTypeInt = roomRate.getRoomRateType().ordinal() + 1;
 
                 if (inputInt >= 1 && inputInt <= 2) {
@@ -466,6 +466,7 @@ public class HotelOperationModule {
         while (true) {
             System.out.print("Select Room Rate Type (1: Published, 2: Normal, 3: Peak, 4: Promotion)> ");
             Integer roomRateInt = scanner.nextInt();
+            scanner.nextLine();
 
             if (roomRateInt >= 1 && roomRateInt <= 4) {
                 newRoomRate.setRoomRateType(RoomRateTypeEnum.values()[roomRateInt - 1]);
@@ -492,6 +493,7 @@ public class HotelOperationModule {
 
         System.out.print("Enter Room Rate Price> ");
         newRoomRate.setRate(scanner.nextBigDecimal());
+        scanner.nextLine();
 
         System.out.print("Enter Room Type Name> ");
         String roomTypeName = scanner.nextLine().trim();
@@ -574,6 +576,7 @@ public class HotelOperationModule {
         while (true) {
             System.out.print("Select Room Rate Type (1: Published, 2: Normal, 3: Peak, 4: Promotion)> ");
             inputInt = scanner.nextInt();
+            scanner.nextLine();
             //Integer previousRoomRateTypeInt = roomRate.getRoomRateType().ordinal() + 1;
 
             if (inputInt >= 1 && inputInt <= 4) {
@@ -721,6 +724,13 @@ public class HotelOperationModule {
         }
 
         System.out.println("\nPlease try again......\n");
+    }
+
+    private void doViewRoomAllocationReport() {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("*** View Todays Room Allocation Report ***\n");
+
     }
 
 }

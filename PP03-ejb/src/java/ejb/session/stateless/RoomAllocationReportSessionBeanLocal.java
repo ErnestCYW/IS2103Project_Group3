@@ -7,6 +7,7 @@ package ejb.session.stateless;
 
 import entity.RoomAllocationReport;
 import java.util.Date;
+import java.util.List;
 import javax.ejb.Local;
 import util.exception.CannotGetTodayDateException;
 
@@ -21,8 +22,12 @@ public interface RoomAllocationReportSessionBeanLocal {
 
     public RoomAllocationReport viewRoomAllocationReportByDate(Date date);
 
-    public RoomAllocationReport viewRoomAllocationReport(Long roomAllocationReportId);
+    public RoomAllocationReport viewRoomAllocationReportById(Long roomAllocationReportId);
 
     public void deleteRoomAllocationReport(Long roomAllocationReportId);
+
+    public List<RoomAllocationReport> viewAllRoomAllocationReports();
+
+    public RoomAllocationReport viewTodayRoomAllocationReport() throws CannotGetTodayDateException;
     
 }

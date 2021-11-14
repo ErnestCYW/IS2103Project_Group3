@@ -30,8 +30,7 @@ public interface GuestSessionBeanRemote {
     
     public Guest retrieveGuestByEmail(String email) throws GuestNotFoundException;
     
-    public Guest guestLogin(String email, String password) throws InvalidLoginCredentialException;
-    
+    public Guest guestLogin(String email, String password) throws InvalidLoginCredentialException;    
 
     public List<Reservation> viewGuestReservations(Guest guest);
 

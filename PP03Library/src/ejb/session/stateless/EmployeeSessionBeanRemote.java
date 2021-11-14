@@ -29,5 +29,6 @@ public interface EmployeeSessionBeanRemote {
     public Employee employeeLogin(String username, String password) throws InvalidLoginCredentialException;
 
     public Long createNewEmployee(Employee newEmployee) throws EmployeeUsernameExistException, UnknownPersistenceException;
+
 }
 

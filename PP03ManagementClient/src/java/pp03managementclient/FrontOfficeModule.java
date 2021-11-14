@@ -18,6 +18,7 @@ import java.util.Scanner;
 import util.enumeration.EmployeeRoleEnum;
 import util.exception.CannotGetWalkInPriceException;
 import util.exception.CheckinGuestException;
+import util.exception.CheckoutGuestException;
 import util.exception.InvalidEmployeeRoleException;
 import util.exception.ReserveRoomException;
 import util.exception.RoomTypeNotFoundException;
@@ -52,8 +53,9 @@ public class FrontOfficeModule {
         while (true) {
             System.out.println("*** HoRS Management System :: Front Office ***\n");
             System.out.println("1: Walk-in Search Room");
-
-            System.out.println("5: Back\n");
+            System.out.println("2: Checkin Guest");
+            System.out.println("3: Checkout Guest");
+            System.out.println("4: Back\n");
             response = 0;
 
             while (response < 1 || response > 4) {
@@ -106,7 +108,7 @@ public class FrontOfficeModule {
             for (RoomType roomType : roomTypes) {
                 try {
                     Integer availableRooms = bookingReservationSessionBeanRemote.getNumOfAvailableRoomsForRoomType(roomType.getRoomTypeId(), checkinDate, checkoutDate);
-                    
+
                     if (availableRooms >= numOfRooms) {
                         Double reservationAmount = bookingReservationSessionBeanRemote.getWalkInPriceForRoomType(roomType, checkinDate, checkoutDate);
                         //save search results to Session Bean
@@ -142,9 +144,9 @@ public class FrontOfficeModule {
 
         try {
             List<Long> reservationIds = bookingReservationSessionBeanRemote.walkInReserveRoom(roomType, numOfRooms, checkinDate, checkoutDate);
-            
+
             System.out.println("Reservation successful: You have reserved " + numOfRooms + " rooms for " + roomType + ". Here are your Reservation IDs: ");
-            for(Long reservationId:reservationIds) {
+            for (Long reservationId : reservationIds) {
                 System.out.println("Reservation ID " + reservationId);
             }
         } catch (ReserveRoomException ex) {
@@ -178,7 +180,14 @@ public class FrontOfficeModule {
         System.out.print("Enter Guest ID> ");
         Long guestId = scanner.nextLong();
 
-        bookingReservationSessionBeanRemote.checkoutGuest(guestId);
-        System.out.println("Check-out successful!");
+        try {
+            List<Room> rooms = bookingReservationSessionBeanRemote.checkoutGuest(guestId);
+            System.out.println("Check-out successful! The guest's rooms are:");
+            for (Room room : rooms) {
+                System.out.println(room.getNumber());
+            }
+        } catch (CheckoutGuestException ex) {
+            System.out.println(ex.getMessage());
+        }
     }
 }

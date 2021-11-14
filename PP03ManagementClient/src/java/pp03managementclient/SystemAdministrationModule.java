@@ -73,11 +73,11 @@ public class SystemAdministrationModule {
                 }
                 else if(response == 3)
                 {
-                    //doCreateNewPartner();
+                    doCreateNewPartner();
                 }
                 else if(response == 4)
                 {
-                    //doViewAllPartners();
+                    doViewAllPartners();
                 }
                 else if(response == 5)
                 {
@@ -183,7 +183,7 @@ public class SystemAdministrationModule {
         System.out.println("*** View All Partners ***\n");
         
         List<Partner> partners = partnerSessionBeanRemote.retrieveAllPartners();
-        System.out.printf("%10s%50s%40s\n", "Employee ID", "Partner Name", "Password");
+        System.out.printf("%10s%50s%40s\n", "Partner ID", "Partner Name", "Password");
 
         for(Partner partner:partners)
         {
