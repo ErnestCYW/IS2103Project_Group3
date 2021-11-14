@@ -5,7 +5,13 @@
  */
 package ejb.session.stateless;
 
+import entity.Reservation;
+import entity.Room;
+import entity.RoomAllocationReport;
+import java.util.Date;
 import javax.ejb.Remote;
+import util.exception.CannotGetTodayDateException;
+import util.exception.RoomAllocationReportNotFoundException;
 
 /**
  *
@@ -13,5 +19,11 @@ import javax.ejb.Remote;
  */
 @Remote
 public interface AllocationSessionBeanRemote {
-    
+
+    public void allocateRoomToCurrentDayReservations() throws CannotGetTodayDateException, RoomAllocationReportNotFoundException;
+
+    public void allocateRoomToFutureDayReservations(Date date) throws CannotGetTodayDateException, RoomAllocationReportNotFoundException;
+
+    public Room allocateRoom(Reservation reservation, RoomAllocationReport roomAllocationReport) throws CannotGetTodayDateException, RoomAllocationReportNotFoundException;
+
 }

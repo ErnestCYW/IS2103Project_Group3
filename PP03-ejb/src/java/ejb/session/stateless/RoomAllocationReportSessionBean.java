@@ -14,6 +14,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import util.exception.CannotGetTodayDateException;
+import util.exception.RoomAllocationReportNotFoundException;
 
 /**
  *
@@ -24,71 +25,82 @@ public class RoomAllocationReportSessionBean implements RoomAllocationReportSess
 
     @EJB
     private HandleDateTimeSessionBeanLocal handleDateTimeSessionBean;
-    
+
     @PersistenceContext(unitName = "PP03-ejbPU")
     private EntityManager em;
 
-    // Add business logic below. (Right-click in editor and choose
-    // "Insert Code > Add Business Method")
     @Override
-    public RoomAllocationReport createRoomAllocationReport() throws CannotGetTodayDateException{
-        
+    public RoomAllocationReport createRoomAllocationReport() throws CannotGetTodayDateException {
+
         RoomAllocationReport newRoomAllocationReportEntity = new RoomAllocationReport(handleDateTimeSessionBean.getTodayDate());
-        
+
         em.persist(newRoomAllocationReportEntity);
         em.flush();
-        
-        return newRoomAllocationReportEntity;
-    }
-    
-    @Override
-    public RoomAllocationReport createRoomAllocationReport() throws CannotGetTodayDateException{
-        
-        RoomAllocationReport newRoomAllocationReportEntity = new RoomAllocationReport(handleDateTimeSessionBean.getTodayDate());
-        
-        em.persist(newRoomAllocationReportEntity);
-        em.flush();
-        
+
         return newRoomAllocationReportEntity;
     }
 
     @Override
-    public RoomAllocationReport viewRoomAllocationReportByDate(Date date) {
-        
-        Query roomAllocationReportQuery = em.createQuery("SELECT rar FROM RoomAllocationReport rar WHERE rar.date = :inDate");
-        roomAllocationReportQuery.setParameter("inDate", date);
-        RoomAllocationReport roomAllocationReport = (RoomAllocationReport) roomAllocationReportQuery.getSingleResult();
-        
-        return roomAllocationReport;
+    public RoomAllocationReport createRoomAllocationReportForFuture(Date date) {
+
+        RoomAllocationReport newRoomAllocationReportEntity = new RoomAllocationReport(date);
+
+        em.persist(newRoomAllocationReportEntity);
+        em.flush();
+
+        return newRoomAllocationReportEntity;
     }
-    
-    @Override
-    public RoomAllocationReport viewRoomAllocationReportById(Long roomAllocationReportId) {
-        
-        RoomAllocationReport roomAllocationReport = em.find(RoomAllocationReport.class, roomAllocationReportId);
-        
-        return roomAllocationReport;
-    }
-    
-    @Override
-    public RoomAllocationReport viewTodayRoomAllocationReport() throws CannotGetTodayDateException {
-        return viewRoomAllocationReportByDate(handleDateTimeSessionBean.getTodayDate());
-    }
-    
+
     @Override
     public List<RoomAllocationReport> viewAllRoomAllocationReports() {
-        
+
         Query query = em.createQuery("SELECT rar FROM RoomAllocationReport rar");
-        
+
         return query.getResultList();
+
     }
 
     @Override
-    public void deleteRoomAllocationReport(Long roomAllocationReportId) {
-        
+    public RoomAllocationReport viewTodayRoomAllocationReport() throws CannotGetTodayDateException, RoomAllocationReportNotFoundException {
+
+        return viewRoomAllocationReportByDate(handleDateTimeSessionBean.getTodayDate());
+
+    }
+
+    @Override
+    public RoomAllocationReport viewRoomAllocationReportByDate(Date date) throws RoomAllocationReportNotFoundException {
+
+        Query query = em.createQuery("SELECT rar FROM RoomAllocationReport rar WHERE rar.date = :inDate ORDER BY rar.RoomAllocationReportId DESC");
+        query.setParameter("inDate", date);
+        List<RoomAllocationReport> temp = query.setMaxResults(1).getResultList();
+
+        if (!temp.isEmpty()) {
+            RoomAllocationReport roomAllocationReport = temp.get(0);
+            return roomAllocationReport;
+        } else {
+            throw new RoomAllocationReportNotFoundException("Cannot Find By Date");
+        }
+    }
+
+    @Override
+    public RoomAllocationReport viewRoomAllocationReportById(Long roomAllocationReportId) throws RoomAllocationReportNotFoundException {
+
+        RoomAllocationReport roomAllocationReport = em.find(RoomAllocationReport.class, roomAllocationReportId);
+
+        if (roomAllocationReport != null) {
+            return roomAllocationReport;
+        } else {
+            throw new RoomAllocationReportNotFoundException("RoomAllocationReport ID " + roomAllocationReportId + " does not exists!");
+        }
+    }
+
+    @Override
+    public void deleteRoomAllocationReport(Long roomAllocationReportId
+    ) {
+
         RoomAllocationReport roomAllocationReportToRemove = em.find(RoomAllocationReport.class, roomAllocationReportId);
-        
+
         em.remove(roomAllocationReportToRemove);
     }
-    
+
 }

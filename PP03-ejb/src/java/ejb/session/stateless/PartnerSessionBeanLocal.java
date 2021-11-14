@@ -26,7 +26,7 @@ public interface PartnerSessionBeanLocal {
 
     public List<Partner> retrieveAllPartners();
 
-    public Partner retrieveEmployeeByPartnerId(Long partnerId) throws PartnerNotFoundException;
+    public Partner retrievePartnerByPartnerId(Long partnerId) throws PartnerNotFoundException;
 
     public Partner retrievePartnerByUsername(String username) throws PartnerNotFoundException;
 

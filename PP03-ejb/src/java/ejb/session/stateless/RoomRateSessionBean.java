@@ -38,8 +38,6 @@ public class RoomRateSessionBean implements RoomRateSessionBeanRemote, RoomRateS
     @PersistenceContext(unitName = "PP03-ejbPU")
     private EntityManager em;
 
-    // Add business logic below. (Right-click in editor and choose
-    // "Insert Code > Add Business Method")
     private final ValidatorFactory validatorFactory;
     private final Validator validator;
     

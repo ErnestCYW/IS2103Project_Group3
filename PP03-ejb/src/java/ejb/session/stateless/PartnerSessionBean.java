@@ -35,8 +35,6 @@ public class PartnerSessionBean implements PartnerSessionBeanRemote, PartnerSess
     @PersistenceContext(unitName = "PP03-ejbPU")
     private EntityManager em;
     
-    
-
     @Override
     public Long createNewPartner(Partner newPartner) throws PartnerUsernameExistException, UnknownPersistenceException
     {
@@ -78,7 +76,7 @@ public class PartnerSessionBean implements PartnerSessionBeanRemote, PartnerSess
     
     
     @Override
-    public Partner retrieveEmployeeByPartnerId(Long partnerId) throws PartnerNotFoundException
+    public Partner retrievePartnerByPartnerId(Long partnerId) throws PartnerNotFoundException
     {
         Partner partner = em.find(Partner.class, partnerId);
         

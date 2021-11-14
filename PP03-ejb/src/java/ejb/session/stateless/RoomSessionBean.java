@@ -42,8 +42,6 @@ public class RoomSessionBean implements RoomSessionBeanRemote, RoomSessionBeanLo
     private final ValidatorFactory validatorFactory;
     private final Validator validator;
 
-    // Add business logic below. (Right-click in editor and choose
-    // "Insert Code > Add Business Method")
     public RoomSessionBean() {
         validatorFactory = Validation.buildDefaultValidatorFactory();
         validator = validatorFactory.getValidator();

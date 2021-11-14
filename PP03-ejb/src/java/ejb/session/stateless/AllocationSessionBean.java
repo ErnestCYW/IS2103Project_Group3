@@ -9,6 +9,7 @@ import entity.Reservation;
 import entity.Room;
 import entity.RoomAllocationReport;
 import entity.RoomType;
+import java.util.Date;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Schedule;
@@ -19,6 +20,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import util.enumeration.RoomStatusEnum;
 import util.exception.CannotGetTodayDateException;
+import util.exception.RoomAllocationReportNotFoundException;
 import util.exception.RoomTypeNotFoundException;
 
 /**
@@ -36,42 +38,49 @@ public class AllocationSessionBean implements AllocationSessionBeanRemote, Alloc
 
     @EJB
     private RoomAllocationReportSessionBeanLocal roomAllocationReportSessionBean;
-    
+
     @PersistenceContext(unitName = "PP03-ejbPU")
     private EntityManager em;
 
-    // Add business logic below. (Right-click in editor and choose
-    // "Insert Code > Add Business Method")
-    
     @Schedules({
-        @Schedule(dayOfWeek="*"),
-        @Schedule(hour="2")
+        @Schedule(dayOfWeek = "*"),
+        @Schedule(hour = "2")
     })
-    public void allocateRoomToCurrentDayReservations() throws CannotGetTodayDateException {
+    public void allocateRoomToCurrentDayReservations() throws CannotGetTodayDateException, RoomAllocationReportNotFoundException {
 
-        roomAllocationReportSessionBean.createRoomAllocationReport();
+        RoomAllocationReport roomAllocationReport = roomAllocationReportSessionBean.createRoomAllocationReport();
 
         Query currentDayReservationsQuery = em.createQuery("SELECT r FROM Reservation r WHERE r.startDate = :inStartDate");
         currentDayReservationsQuery.setParameter("inStartDate", handleDateTimeSessionBean.getTodayDate());
         List<Reservation> reservations = currentDayReservationsQuery.getResultList();
 
         for (Reservation reservation : reservations) {
-            allocateRoom(reservation);
+            allocateRoom(reservation, roomAllocationReport);
         }
 
     }
-    
-    public void allocateRoomByDay(Date day) {
-        
-        try{
-            roomAllocationReportSessionBean.createRoomAllocationReport();
-        } catch ()
-        
+
+    //The following method is never called in our implementation of the business process.
+    //It is purely to demonstrate allocation logic and has its restrictions. See docs.
+    @Override
+    public void allocateRoomToFutureDayReservations(Date date) throws CannotGetTodayDateException, RoomAllocationReportNotFoundException {
+
+        RoomAllocationReport roomAllocationReport = roomAllocationReportSessionBean.createRoomAllocationReportForFuture(date);
+
+        Query query = em.createQuery("SELECT r FROM Reservation r WHERE r.startDate = :inStartDate");
+        query.setParameter("inStartDate", date);
+        List<Reservation> reservations = query.getResultList();
+
+        for (Reservation reservation : reservations) {
+            allocateRoom(reservation, roomAllocationReport);
+        }
+
     }
 
     @Override
-    public Room allocateRoom(Reservation reservation) throws CannotGetTodayDateException {
+    public Room allocateRoom(Reservation reservation, RoomAllocationReport roomAllocationReport) throws CannotGetTodayDateException {
 
+        //Can find same type room
         RoomType roomType = reservation.getRoomType();
 
         Query availableSameTypeRoomsQuery = em.createQuery("SELECT r FROM Room r "
@@ -82,7 +91,7 @@ public class AllocationSessionBean implements AllocationSessionBeanRemote, Alloc
         List<Room> temp1 = availableSameTypeRoomsQuery.setMaxResults(1).getResultList();
 
         if (!temp1.isEmpty()) {
-            
+
             Room availableSameTypeRoom = temp1.get(0);
 
             availableSameTypeRoom.setCurrentReservation(reservation);
@@ -92,8 +101,7 @@ public class AllocationSessionBean implements AllocationSessionBeanRemote, Alloc
 
         } else {
 
-            RoomAllocationReport roomAllocationReport = roomAllocationReportSessionBean
-                    .viewRoomAllocationReportByDate(handleDateTimeSessionBean.getTodayDate());
+            //Can find different type room of higher quality
 
             while (roomType.getNextHigherRoomType() != null) {
 
@@ -105,7 +113,7 @@ public class AllocationSessionBean implements AllocationSessionBeanRemote, Alloc
                 List<Room> temp2 = availableDifferentTypeRoomsQuery.setMaxResults(1).getResultList();
 
                 if (!temp2.isEmpty()) {
-                    
+
                     Room availableDifferentTypeRoom = temp2.get(0);
 
                     availableDifferentTypeRoom.setCurrentReservation(reservation);
@@ -115,29 +123,30 @@ public class AllocationSessionBean implements AllocationSessionBeanRemote, Alloc
                             + reservation.getRoomType() + " to room: " + availableDifferentTypeRoom.getNumber()
                             + " of type: " + availableDifferentTypeRoom.getRoomType();
                     roomAllocationReport.getNoAvailableRoomUpgrade().add(notificationMessage);
-                    
+
                     return availableDifferentTypeRoom;
 
                 } else {
-                    
+
                     try {
-                    
+
                         roomType = roomTypeSessionBean.retrieveRoomTypeByName(roomType.getNextHigherRoomType());
-                    
+
                     } catch (RoomTypeNotFoundException ex) {
-                        
+
                         break;
-                    
+
                     }
 
                 }
             }
 
+            //Cannot find any rooms
             String notificationMessage = reservation.getReservationId() + " cannot be allocated a room";
             roomAllocationReport.getNoAvailableRoomNoUpgrade().add(notificationMessage);
 
             return null;
-            
+
         }
 
     }

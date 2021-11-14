@@ -140,48 +140,6 @@ public class RoomTypeSessionBean implements RoomTypeSessionBeanRemote, RoomTypeS
         } else {
             roomTypeEntityToRemove.setDisabled(true);
         }
-
-        /**
-        if (!(rooms.isEmpty() & reservations.isEmpty())) {
-            roomTypeEntityToRemove.setDisabled(true);
-        } else if  {
-
-        } else {
-            List<RoomRate> roomRates = roomTypeEntityToRemove.getRoomRates();
-
-            for (RoomRate roomRate : roomRates) {
-                if (roomRate.getReservations().isEmpty()) {
-                    roomRateSessionBean.deleteRoomRate(roomRate.getRoomRateId());
-                } else {
-                    roomTypeEntityToRemove.setDisabled(true);   //Somehow roomRate is in use, should never occur
-                    return;
-                }
-            }
-            em.remove(roomTypeEntityToRemove);
-        }
-        **/
-        
-        //Can refactor with JPQL to lower runtime complexity
-//        for (Room room : rooms) {
-//            if (!room.isDisabled()) {
-//                roomTypeEntityToRemove.setDisabled(true);
-//                return;
-//            } else {
-//                roomTypeEntityToRemove.getRooms().remove(room);
-//            }
-//        }
-//        
-//        //Can refactor with JPQL to lower runtime complexity
-//        for (Reservation reservation : reservations) {
-//            if (reservation.isPassed()) {
-//                roomTypeEntityToRemove.getReservations().remove(reservation);
-//            } else {
-//                roomTypeEntityToRemove.setDisabled(true);
-//                return;
-//            }
-//        }
-        
-        
         
     }
 

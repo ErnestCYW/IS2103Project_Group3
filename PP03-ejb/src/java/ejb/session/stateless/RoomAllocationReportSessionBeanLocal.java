@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.List;
 import javax.ejb.Local;
 import util.exception.CannotGetTodayDateException;
+import util.exception.RoomAllocationReportNotFoundException;
 
 /**
  *
@@ -20,14 +21,16 @@ public interface RoomAllocationReportSessionBeanLocal {
 
     public RoomAllocationReport createRoomAllocationReport() throws CannotGetTodayDateException;
 
-    public RoomAllocationReport viewRoomAllocationReportByDate(Date date);
+    public RoomAllocationReport createRoomAllocationReportForFuture(Date date);
 
-    public RoomAllocationReport viewRoomAllocationReportById(Long roomAllocationReportId);
+    public RoomAllocationReport viewRoomAllocationReportByDate(Date date) throws RoomAllocationReportNotFoundException;
 
-    public void deleteRoomAllocationReport(Long roomAllocationReportId);
+    public RoomAllocationReport viewRoomAllocationReportById(Long roomAllocationReportId) throws RoomAllocationReportNotFoundException;
+
+    public RoomAllocationReport viewTodayRoomAllocationReport() throws CannotGetTodayDateException, RoomAllocationReportNotFoundException;
 
     public List<RoomAllocationReport> viewAllRoomAllocationReports();
 
-    public RoomAllocationReport viewTodayRoomAllocationReport() throws CannotGetTodayDateException;
-    
+    public void deleteRoomAllocationReport(Long roomAllocationReportId);
+
 }
