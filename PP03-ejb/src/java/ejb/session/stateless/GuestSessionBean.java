@@ -158,6 +158,7 @@ public class GuestSessionBean implements GuestSessionBeanRemote, GuestSessionBea
         } catch (GuestNotFoundException ex) {
             ex.printStackTrace();
         }
+        guest.getReservations().size();
         return guest.getReservations();
     
     }

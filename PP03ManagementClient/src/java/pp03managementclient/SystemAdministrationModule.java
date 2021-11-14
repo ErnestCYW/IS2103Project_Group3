@@ -31,7 +31,9 @@ public class SystemAdministrationModule {
     public SystemAdministrationModule() {
     }
 
-    public SystemAdministrationModule(EmployeeSessionBeanRemote employeeSessionBeanRemote, PartnerSessionBeanRemote partnerSessionBeanRemote, Employee loggedInEmployee) {
+    public SystemAdministrationModule(EmployeeSessionBeanRemote employeeSessionBeanRemote,
+            PartnerSessionBeanRemote partnerSessionBeanRemote,
+            Employee loggedInEmployee) {
         this.employeeSessionBeanRemote = employeeSessionBeanRemote;
         this.partnerSessionBeanRemote = partnerSessionBeanRemote;
         this.loggedInEmployee = loggedInEmployee;
@@ -129,7 +131,7 @@ public class SystemAdministrationModule {
         
         try {
             Long employeeId = employeeSessionBeanRemote.createNewEmployee(newEmployee);
-            System.out.println("Employee ID " + employeeId + " created successfully!");
+            System.out.println("Employee ID " + employeeId + " created successfully!\n");
         } catch (EmployeeUsernameExistException ex) {
             System.out.println("Username already exist");
         } catch (UnknownPersistenceException ex) {
@@ -144,14 +146,14 @@ public class SystemAdministrationModule {
         System.out.println("*** View All Employees ***\n");
         
         List<Employee> employees = employeeSessionBeanRemote.retrieveAllEmployees();
-        System.out.printf("%8s%20s%20s%15s%20s%20s\n", "Employee ID", "First Name", "Last Name", "Employee Role", "Username", "Password");
+        System.out.printf("%8s%30s%30s%25s%30s%30s\n", "Employee ID", "First Name", "Last Name", "Employee Role", "Username", "Password");
 
         for(Employee employee:employees)
         {
-            System.out.printf("%8s%20s%20s%15s%20s%20s\n", employee.getEmployeeId().toString(), employee.getFirstName(), employee.getLastName(), employee.getEmployeeRoleEnum().toString(), employee.getUsername(), employee.getPassword());
+            System.out.printf("%8s%30s%30s%25s%30s%30s\n", employee.getEmployeeId().toString(), employee.getFirstName(), employee.getLastName(), employee.getEmployeeRoleEnum().toString(), employee.getUsername(), employee.getPassword());
         }
         
-        System.out.print("Press any key to continue...> ");
+        System.out.print("Press any key to continue...> \n");
         scanner.nextLine();
     }
     
@@ -168,9 +170,9 @@ public class SystemAdministrationModule {
         
         try {
             Long partnerId = partnerSessionBeanRemote.createNewPartner(newPartner);
-            System.out.println("Partner ID " + partnerId + " created successfully!");
+            System.out.println("Partner ID " + partnerId + " created successfully! \n");
         } catch (PartnerUsernameExistException ex) {
-            System.out.println("Username already exist");
+            System.out.println("Username already exist \n");
         } catch (UnknownPersistenceException ex) {
             System.out.println(ex.getMessage());
         }
@@ -190,7 +192,7 @@ public class SystemAdministrationModule {
             System.out.printf("%10s%50s%40s\n", partner.getPartnerId().toString(), partner.getPartnerName(), partner.getPassword());
         }
         
-        System.out.print("Press any key to continue...> ");
+        System.out.print("Press any key to continue...> \n");
         scanner.nextLine();
     }
     

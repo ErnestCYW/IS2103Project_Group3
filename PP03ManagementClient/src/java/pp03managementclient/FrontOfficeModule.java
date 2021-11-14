@@ -36,7 +36,9 @@ public class FrontOfficeModule {
     public FrontOfficeModule() {
     }
 
-    public FrontOfficeModule(RoomTypeSessionBeanRemote roomTypeSessionBeanRemote, BookingReservationSessionBeanRemote bookingReservationSessionBeanRemote, Employee loggedInEmployee) {
+    public FrontOfficeModule(RoomTypeSessionBeanRemote roomTypeSessionBeanRemote,
+            BookingReservationSessionBeanRemote bookingReservationSessionBeanRemote,
+            Employee loggedInEmployee) {
         this.roomTypeSessionBeanRemote = roomTypeSessionBeanRemote;
         this.bookingReservationSessionBeanRemote = bookingReservationSessionBeanRemote;
         this.loggedInEmployee = loggedInEmployee;
@@ -65,10 +67,25 @@ public class FrontOfficeModule {
 
                 if (response == 1) {
                     doSearchRoom();
+                    System.out.println("*** HoRS Management System :: Front Office ***\n");
+                    System.out.println("1: Walk-in Search Room");
+                    System.out.println("2: Checkin Guest");
+                    System.out.println("3: Checkout Guest");
+                    System.out.println("4: Back\n");
                 } else if (response == 2) {
                     doCheckinGuest();
+                    System.out.println("*** HoRS Management System :: Front Office ***\n");
+                    System.out.println("1: Walk-in Search Room");
+                    System.out.println("2: Checkin Guest");
+                    System.out.println("3: Checkout Guest");
+                    System.out.println("4: Back\n");
                 } else if (response == 3) {
                     doCheckoutGuest();
+                    System.out.println("*** HoRS Management System :: Front Office ***\n");
+                    System.out.println("1: Walk-in Search Room");
+                    System.out.println("2: Checkin Guest");
+                    System.out.println("3: Checkout Guest");
+                    System.out.println("4: Back\n");
                 } else if (response == 4) {
                     break;
                 } else {
@@ -102,8 +119,8 @@ public class FrontOfficeModule {
             Date checkoutDate = formatter.parse(checkoutDateStr);
 
             List<RoomType> roomTypes = roomTypeSessionBeanRemote.viewAllRoomTypes();
-            //Maybe don't need available rooms
-            System.out.printf("%20s%20s%30s%30s\n", "Room Type ID", "Name", "Available Rooms", "Reservation Amount");
+
+            System.out.printf("%30s%30s%40s%40s\n", "Room Type ID", "Name", "Available Rooms", "Reservation Amount");
 
             for (RoomType roomType : roomTypes) {
                 try {
@@ -113,7 +130,7 @@ public class FrontOfficeModule {
                         Double reservationAmount = bookingReservationSessionBeanRemote.getWalkInPriceForRoomType(roomType, checkinDate, checkoutDate);
                         //save search results to Session Bean
                         bookingReservationSessionBeanRemote.saveSearchResults(roomType.getName(), availableRooms);
-                        System.out.printf("%20s%20s%30s%30s\n", roomType.getRoomTypeId(), roomType.getName(), availableRooms, reservationAmount);
+                        System.out.printf("%30s%30s%40s%40s\n", roomType.getRoomTypeId(), roomType.getName(), availableRooms, reservationAmount);
                     }
                 } catch (RoomTypeNotFoundException | CannotGetWalkInPriceException ex) {
                     System.out.println(ex.getMessage());
@@ -127,10 +144,9 @@ public class FrontOfficeModule {
 
             if (response.equals("Y")) {
                 doReserveRoom(checkinDate, checkoutDate);
-                //doReserveRoom(numOfRooms);
             }
         } catch (ParseException ex) {
-            ex.printStackTrace();
+            System.out.println(ex.getMessage() + "\n");
         }
     }
 
@@ -145,12 +161,14 @@ public class FrontOfficeModule {
         try {
             List<Long> reservationIds = bookingReservationSessionBeanRemote.walkInReserveRoom(roomType, numOfRooms, checkinDate, checkoutDate);
 
-            System.out.println("Reservation successful: You have reserved " + numOfRooms + " rooms for " + roomType + ". Here are your Reservation IDs: ");
+            System.out.println("\nReservation successful: You have reserved " + numOfRooms + " rooms for " + roomType + ".");
+            System.out.println("Here are your reservation IDs: ");
             for (Long reservationId : reservationIds) {
-                System.out.println("Reservation ID " + reservationId);
+                System.out.println("Reservation ID > " + reservationId);
             }
+            System.out.println(" ");
         } catch (ReserveRoomException ex) {
-            System.out.println(ex.getMessage());
+            System.out.println(ex.getMessage() + "\n");
         }
 
     }
@@ -166,10 +184,10 @@ public class FrontOfficeModule {
             List<Room> rooms = bookingReservationSessionBeanRemote.checkinGuest(guestId);
             System.out.println("Check-in succesful! The guest's rooms are: ");
             for (Room room : rooms) {
-                System.out.println(room.getNumber());
+                System.out.println("Room > " + room.getNumber());
             }
         } catch (CheckinGuestException ex) {
-            System.out.println(ex.getMessage());
+            System.out.println(ex.getMessage() + "\n");
         }
     }
 
@@ -184,10 +202,10 @@ public class FrontOfficeModule {
             List<Room> rooms = bookingReservationSessionBeanRemote.checkoutGuest(guestId);
             System.out.println("Check-out successful! The guest's rooms are:");
             for (Room room : rooms) {
-                System.out.println(room.getNumber());
+                System.out.println("Room > " + room.getNumber());
             }
         } catch (CheckoutGuestException ex) {
-            System.out.println(ex.getMessage());
+            System.out.println(ex.getMessage() + "\n");
         }
     }
 }

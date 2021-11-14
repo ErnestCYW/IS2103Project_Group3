@@ -9,6 +9,7 @@ import entity.Reservation;
 import entity.Room;
 import entity.RoomAllocationReport;
 import java.util.Date;
+import java.util.HashMap;
 import javax.ejb.Local;
 import util.exception.CannotGetTodayDateException;
 import util.exception.RoomAllocationReportNotFoundException;
@@ -22,7 +23,7 @@ public interface AllocationSessionBeanLocal {
 
     public void allocateRoomToCurrentDayReservations() throws CannotGetTodayDateException, RoomAllocationReportNotFoundException;
 
-    public void allocateRoomToFutureDayReservations(Date date) throws CannotGetTodayDateException, RoomAllocationReportNotFoundException;
+    public HashMap<Reservation, Room> allocateRoomToFutureDayReservations(Date date) throws CannotGetTodayDateException, RoomAllocationReportNotFoundException;
 
     public Room allocateRoom(Reservation reservation, RoomAllocationReport roomAllocationReport) throws CannotGetTodayDateException, RoomAllocationReportNotFoundException;
 

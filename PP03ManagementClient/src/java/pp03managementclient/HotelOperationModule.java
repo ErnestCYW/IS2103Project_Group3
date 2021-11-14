@@ -5,12 +5,16 @@
  */
 package pp03managementclient;
 
+import ejb.session.stateless.AllocationSessionBeanRemote;
 import ejb.session.stateless.HandleDateTimeSessionBeanRemote;
+import ejb.session.stateless.RoomAllocationReportSessionBeanRemote;
 import ejb.session.stateless.RoomRateSessionBeanRemote;
 import ejb.session.stateless.RoomSessionBeanRemote;
 import ejb.session.stateless.RoomTypeSessionBeanRemote;
 import entity.Employee;
+import entity.Reservation;
 import entity.Room;
+import entity.RoomAllocationReport;
 import entity.RoomRate;
 import entity.RoomType;
 import java.math.BigDecimal;
@@ -19,6 +23,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
@@ -29,8 +34,10 @@ import javax.validation.ValidatorFactory;
 import util.enumeration.EmployeeRoleEnum;
 import util.enumeration.RoomRateTypeEnum;
 import util.enumeration.RoomStatusEnum;
+import util.exception.CannotGetTodayDateException;
 import util.exception.InputDataValidationException;
 import util.exception.InvalidEmployeeRoleException;
+import util.exception.RoomAllocationReportNotFoundException;
 import util.exception.RoomNotFoundException;
 import util.exception.RoomRateNotFoundException;
 import util.exception.RoomTypeExistException;
@@ -50,6 +57,8 @@ public class HotelOperationModule {
     private RoomRateSessionBeanRemote roomRateSessionBeanRemote;
     private RoomTypeSessionBeanRemote roomTypeSessionBeanRemote;
     private HandleDateTimeSessionBeanRemote handleDateTimeSessionBeanRemote;
+    private RoomAllocationReportSessionBeanRemote roomAllocationReportSessionBeanRemote;
+    private AllocationSessionBeanRemote allocationSessionBeanRemote;
 
     private Employee loggedInEmployee;
 
@@ -60,12 +69,20 @@ public class HotelOperationModule {
 
     }
 
-    public HotelOperationModule(RoomSessionBeanRemote roomSessionBeanRemote, RoomRateSessionBeanRemote roomRateSessionBeanRemote, RoomTypeSessionBeanRemote roomTypeSessionBeanRemote, HandleDateTimeSessionBeanRemote handleDateTimeSessionBeanRemote, Employee loggedInEmployee) {
+    public HotelOperationModule(RoomSessionBeanRemote roomSessionBeanRemote,
+            RoomRateSessionBeanRemote roomRateSessionBeanRemote,
+            RoomTypeSessionBeanRemote roomTypeSessionBeanRemote,
+            HandleDateTimeSessionBeanRemote handleDateTimeSessionBeanRemote,
+            RoomAllocationReportSessionBeanRemote roomAllocationReportSessionBeanRemote,
+            AllocationSessionBeanRemote allocationSessionBeanRemote,
+            Employee loggedInEmployee) {
         this();
         this.roomSessionBeanRemote = roomSessionBeanRemote;
         this.roomRateSessionBeanRemote = roomRateSessionBeanRemote;
         this.roomTypeSessionBeanRemote = roomTypeSessionBeanRemote;
         this.handleDateTimeSessionBeanRemote = handleDateTimeSessionBeanRemote;
+        this.roomAllocationReportSessionBeanRemote = roomAllocationReportSessionBeanRemote;
+        this.allocationSessionBeanRemote = allocationSessionBeanRemote;
         this.loggedInEmployee = loggedInEmployee;
     }
 
@@ -83,15 +100,15 @@ public class HotelOperationModule {
             System.out.println("2: View Room Type Details");
             System.out.println("3: View All Room Types");
             System.out.println("4: Create New Room");
-            System.out.println("5: Update Room");
+            System.out.println("5: Update Room ");
             System.out.println("6: Delete Room");
             System.out.println("7: View All Rooms");
-            System.out.println("8: View Room Allocation Exception Report");
-            System.out.println("9: Create New Room Rate");
-            System.out.println("9: Create New Room Rate");
-            System.out.println("10: View Room Rate Details");
-            System.out.println("11: View All Room Rates");
-            System.out.println("12: Back\n");
+            System.out.println("8: Allocate Rooms (TESTING ONLY)");
+            System.out.println("9: View Room Allocation Exception Report");
+            System.out.println("10: Create New Room Rate");
+            System.out.println("11: View Room Rate Details");
+            System.out.println("12: View All Room Rates");
+            System.out.println("13: Back\n");
             response = 0;
 
             while (response < 1 || response > 12) {
@@ -114,21 +131,23 @@ public class HotelOperationModule {
                 } else if (response == 7) {
                     doViewAllRooms();
                 } else if (response == 8) {
-                    doViewRoomAllocationReport();
+                    doAllocateRoom();
                 } else if (response == 9) {
-                    doCreateNewRoomRate();
+                    doViewRoomAllocationReport();
                 } else if (response == 10) {
-                    doViewRoomRateDetails();
+                    doCreateNewRoomRate();
                 } else if (response == 11) {
-                    doViewAllRoomRates();
+                    doViewRoomRateDetails();
                 } else if (response == 12) {
+                    doViewAllRoomRates();
+                } else if (response == 13) {
                     break;
                 } else {
                     System.out.println("Invalid option, please try again!\n");
                 }
             }
 
-            if (response == 12) {
+            if (response == 13) {
                 break;
             }
         }
@@ -524,17 +543,6 @@ public class HotelOperationModule {
 
         try {
             RoomRate roomRate = roomRateSessionBeanRemote.viewRoomRateDetails(roomRateId);
-//            if (roomRate.getStartDate() == null && roomRate.getEndDate() == null) {
-//                System.out.printf("%8s%20s%20s%15s%20s%20s\n", "Room Rate ID", "Name", "Room Type", "Room Rate Type", "Rate", "Disabled");
-//                System.out.printf("%8s%20s%20s%15s%20s%20s\n", roomRate.getRoomRateId(), roomRate.getName(), roomRate.getRoomType().getName(), roomRate.getRoomRateType().toString(), NumberFormat.getCurrencyInstance().format(roomRate.getRate()), printDisabled(roomRate.isDisabled()));
-//            } else {
-//                System.out.printf("%8s%20s%20s%15s%20s%10s%5s%5s\n", "Room Rate ID", "Name", "Room Type", "Room Rate Type", "Start Date", "End Date", "Rate", "Disabled");
-//                SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-//                String startDateStr = formatter.format(roomRate.getStartDate());
-//                String endDateStr = formatter.format(roomRate.getEndDate());
-//
-//                System.out.printf("%8s%20s%20s%15s%20s%10s%5s%5s\n", roomRate.getRoomRateId(), roomRate.getName(), roomRate.getRoomType().getName(), roomRate.getRoomRateType().toString(), startDateStr, endDateStr, NumberFormat.getCurrencyInstance().format(roomRate.getRate()), printDisabled(roomRate.isDisabled()));
-//            }
 
             System.out.printf("%8s%20s%20s%15s%20s%10s%5s%5s\n", "Room Rate ID", "Name", "Room Type", "Room Rate Type", "Start Date", "End Date", "Rate", "Disabled");
             SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
@@ -727,9 +735,61 @@ public class HotelOperationModule {
     }
 
     private void doViewRoomAllocationReport() {
-        Scanner scanner = new Scanner(System.in);
+        try {
+            Scanner scanner = new Scanner(System.in);
 
-        System.out.println("*** View Todays Room Allocation Report ***\n");
+            System.out.println("*** View Todays Room Allocation Report ***\n");
+            System.out.print("Enter Report Date (TO TEST FUTURE KEY IN FUTURE DATE)> ");
+            String reportDateStr = scanner.nextLine().trim();
+
+            SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+            Date reportDate = formatter.parse(reportDateStr);
+
+            RoomAllocationReport roomAllocationReport = roomAllocationReportSessionBeanRemote.viewRoomAllocationReportByDate(reportDate);
+
+            System.out.print("\n Report for Date: " + reportDateStr + "\n");
+
+            List<String> noAvailableRoomUpgrade = roomAllocationReport.getNoAvailableRoomUpgrade();
+            for (String ex : noAvailableRoomUpgrade) {
+                System.out.println(ex);
+            }
+
+            List<String> noAvailableRoomNoUpgrade = roomAllocationReport.getNoAvailableRoomNoUpgrade();
+            for (String ex : noAvailableRoomNoUpgrade) {
+                System.out.println(ex);
+            }
+
+            System.out.println("");
+
+        } catch (ParseException | RoomAllocationReportNotFoundException ex) {
+            System.out.println(ex.getMessage() + "\n");
+        }
+    }
+
+    private void doAllocateRoom() {
+
+        try {
+
+            Scanner scanner = new Scanner(System.in);
+
+            System.out.println("*** Allocate Rooms (TESTING ONLY) ***\n");
+            System.out.print("Enter Trigger Date> ");
+            String triggerDateStr = scanner.nextLine().trim();
+
+            SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+            Date triggerDate = formatter.parse(triggerDateStr);
+
+            HashMap<Reservation, Room> allocation = allocationSessionBeanRemote.allocateRoomToFutureDayReservations(triggerDate);
+
+            for (Reservation key : allocation.keySet()) {
+                System.out.println("Reservation Id: " + key.getReservationId() + " was allocated room number: " + allocation.get(key).getRoomId());    
+            }
+            
+            System.out.println("");
+            
+        } catch (ParseException | CannotGetTodayDateException | RoomAllocationReportNotFoundException ex) {
+            System.out.println(ex.getMessage() + "\n");
+        }
 
     }
 

@@ -10,6 +10,7 @@ import entity.Room;
 import entity.RoomAllocationReport;
 import entity.RoomType;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Schedule;
@@ -63,8 +64,10 @@ public class AllocationSessionBean implements AllocationSessionBeanRemote, Alloc
     //The following method is never called in our implementation of the business process.
     //It is purely to demonstrate allocation logic and has its restrictions. See docs.
     @Override
-    public void allocateRoomToFutureDayReservations(Date date) throws CannotGetTodayDateException, RoomAllocationReportNotFoundException {
+    public HashMap<Reservation, Room> allocateRoomToFutureDayReservations(Date date) throws CannotGetTodayDateException, RoomAllocationReportNotFoundException {
 
+        HashMap<Reservation, Room> allocation = new HashMap<>();
+        
         RoomAllocationReport roomAllocationReport = roomAllocationReportSessionBean.createRoomAllocationReportForFuture(date);
 
         Query query = em.createQuery("SELECT r FROM Reservation r WHERE r.startDate = :inStartDate");
@@ -72,9 +75,11 @@ public class AllocationSessionBean implements AllocationSessionBeanRemote, Alloc
         List<Reservation> reservations = query.getResultList();
 
         for (Reservation reservation : reservations) {
-            allocateRoom(reservation, roomAllocationReport);
+            Room room = allocateRoom(reservation, roomAllocationReport);
+            allocation.put(reservation, room);
         }
-
+        
+        return allocation;
     }
 
     @Override
@@ -119,7 +124,7 @@ public class AllocationSessionBean implements AllocationSessionBeanRemote, Alloc
                     availableDifferentTypeRoom.setCurrentReservation(reservation);
                     availableDifferentTypeRoom.setStatus(RoomStatusEnum.UNAVAILABLE);
 
-                    String notificationMessage = reservation.getReservationId() + " has been upgraded from "
+                    String notificationMessage = "Reservation ID: " + reservation.getReservationId() + " has been upgraded from "
                             + reservation.getRoomType() + " to room: " + availableDifferentTypeRoom.getNumber()
                             + " of type: " + availableDifferentTypeRoom.getRoomType();
                     roomAllocationReport.getNoAvailableRoomUpgrade().add(notificationMessage);
@@ -142,7 +147,7 @@ public class AllocationSessionBean implements AllocationSessionBeanRemote, Alloc
             }
 
             //Cannot find any rooms
-            String notificationMessage = reservation.getReservationId() + " cannot be allocated a room";
+            String notificationMessage = "Reservation ID: " + reservation.getReservationId() + " cannot be allocated a room";
             roomAllocationReport.getNoAvailableRoomNoUpgrade().add(notificationMessage);
 
             return null;

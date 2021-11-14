@@ -401,7 +401,7 @@ public class BookingReservationSessionBean implements BookingReservationSessionB
         if (guestRooms.isEmpty()) {
             throw new CheckinGuestException("Guest has no rooms available for Check-in. "
                     + "If you have a reservation starting today, it means that the hotel is fully booked"
-                    + "and system could not auto allocate you a room.");
+                    + " and system could not auto allocate you a room.");
         }
 
         return guestRooms;
@@ -411,7 +411,7 @@ public class BookingReservationSessionBean implements BookingReservationSessionB
     //Can refactor with JPQL to improve complexity
     @Override
     public List<Room> checkoutGuest(Long guestId) throws CheckoutGuestException {
-
+        
         //Disassociate Room Rate (Guest reservations using this rate and has not passed)
         try {
             List<Reservation> guestReservations = guestSessionBeanLocal.viewGuestReservations(guestSessionBeanLocal.retrieveGuestByGuestId(guestId));
@@ -429,7 +429,7 @@ public class BookingReservationSessionBean implements BookingReservationSessionB
             }
 
         } catch (GuestNotFoundException ex) {
-            throw new CheckoutGuestException("Guest has no reservations to checkout");
+            throw new CheckoutGuestException("Guest does not exist");
         }
 
         //Disassociate Rooms (Current reservation of the guest)

@@ -6,6 +6,7 @@
 package ejb.session.singleton;
 
 import ejb.session.stateless.EmployeeSessionBeanLocal;
+import ejb.session.stateless.RoomAllocationReportSessionBeanLocal;
 import ejb.session.stateless.RoomRateSessionBeanLocal;
 import ejb.session.stateless.RoomTypeSessionBeanLocal;
 import ejb.session.stateless.RoomSessionBeanLocal;
@@ -23,6 +24,7 @@ import javax.ejb.LocalBean;
 import javax.ejb.Startup;
 import util.enumeration.EmployeeRoleEnum;
 import util.enumeration.RoomRateTypeEnum;
+import util.exception.CannotGetTodayDateException;
 import util.exception.EmployeeNotFoundException;
 import util.exception.EmployeeUsernameExistException;
 import util.exception.InputDataValidationException;
@@ -40,21 +42,20 @@ import util.exception.UnknownPersistenceException;
 public class DataInitSessionBean {
 
     @EJB
+    private RoomAllocationReportSessionBeanLocal roomAllocationReportSessionBeanLocal;
+
+    @EJB
     private RoomSessionBeanLocal roomSessionBeanLocal;
 
     @EJB
     private EmployeeSessionBeanLocal employeeSessionBeanLocal;
     
-    
-
     @EJB
     private RoomTypeSessionBeanLocal roomTypeSessionBean;
 
     @EJB
     private RoomRateSessionBeanLocal roomRateSessionBean;
 
-    // Add business logic below. (Right-click in editor and choose
-    // "Insert Code > Add Business Method")
     @PostConstruct
     public void postConstruct() {
         try {
@@ -121,7 +122,9 @@ public class DataInitSessionBean {
             roomSessionBeanLocal.createNewRoom(grandSuiteId, new Room("0405"));
             roomSessionBeanLocal.createNewRoom(grandSuiteId, new Room("0505"));
             
-        } catch (EmployeeUsernameExistException | UnknownPersistenceException | InputDataValidationException | RoomTypeExistException | RoomTypeNotFoundException ex) {
+            roomAllocationReportSessionBeanLocal.createRoomAllocationReport();
+            
+        } catch (EmployeeUsernameExistException | UnknownPersistenceException | InputDataValidationException | RoomTypeExistException | RoomTypeNotFoundException | CannotGetTodayDateException ex) {
 
             ex.printStackTrace();
         }

@@ -6,6 +6,7 @@
 package pp03managementclient;
 
 import ejb.session.stateful.BookingReservationSessionBeanRemote;
+import ejb.session.stateless.AllocationSessionBeanRemote;
 import ejb.session.stateless.EmployeeSessionBeanRemote;
 import ejb.session.stateless.HandleDateTimeSessionBeanRemote;
 import ejb.session.stateless.PartnerSessionBeanRemote;
@@ -22,39 +23,45 @@ import javax.ejb.EJB;
 public class Main {
 
     @EJB
-    private static RoomAllocationReportSessionBeanRemote roomAllocationReportSessionBeanRemote;
-
-    @EJB
-    private static HandleDateTimeSessionBeanRemote handleDateTimeSessionBeanRemote;
-
-    @EJB
-    private static RoomRateSessionBeanRemote roomRateSessionBeanRemote;
-
-    @EJB
-    private static RoomSessionBeanRemote roomSessionBeanRemote;
-    
-
-    @EJB
-    private static BookingReservationSessionBeanRemote bookingReservationSessionBeanRemote;
-
-    @EJB
-    private static RoomTypeSessionBeanRemote roomTypeSessionBeanRemote;
-
+    private static EmployeeSessionBeanRemote employeeSessionBeanRemote;
     
     @EJB
     private static PartnerSessionBeanRemote partnerSessionBeanRemote;
 
     @EJB
-    private static EmployeeSessionBeanRemote employeeSessionBeanRemote;
+    private static RoomSessionBeanRemote roomSessionBeanRemote; 
     
-    
+    @EJB
+    private static RoomRateSessionBeanRemote roomRateSessionBeanRemote;
 
+    @EJB
+    private static RoomTypeSessionBeanRemote roomTypeSessionBeanRemote;
+    
+    @EJB
+    private static BookingReservationSessionBeanRemote bookingReservationSessionBeanRemote;
+
+    @EJB
+    private static HandleDateTimeSessionBeanRemote handleDateTimeSessionBeanRemote;
+    
+    @EJB
+    private static RoomAllocationReportSessionBeanRemote roomAllocationReportSessionBeanRemote;
+    
+    @EJB
+    private static AllocationSessionBeanRemote allocationSessionBeanRemote;
     
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        MainApp mainApp = new MainApp(employeeSessionBeanRemote, partnerSessionBeanRemote, roomSessionBeanRemote, roomRateSessionBeanRemote, roomTypeSessionBeanRemote, bookingReservationSessionBeanRemote, handleDateTimeSessionBeanRemote, roomAllocationReportSessionBeanRemote);
+        MainApp mainApp = new MainApp(employeeSessionBeanRemote, 
+                partnerSessionBeanRemote, 
+                roomSessionBeanRemote, 
+                roomRateSessionBeanRemote, 
+                roomTypeSessionBeanRemote, 
+                bookingReservationSessionBeanRemote, 
+                handleDateTimeSessionBeanRemote, 
+                roomAllocationReportSessionBeanRemote,
+                allocationSessionBeanRemote);
         mainApp.runApp();
     }
     

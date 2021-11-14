@@ -7,9 +7,6 @@ package pp03reservationclient;
 
 import ejb.session.stateful.BookingReservationSessionBeanRemote;
 import ejb.session.stateless.GuestSessionBeanRemote;
-import ejb.session.stateless.HandleDateTimeSessionBeanRemote;
-import ejb.session.stateless.RoomRateSessionBeanRemote;
-import ejb.session.stateless.RoomSessionBeanRemote;
 import ejb.session.stateless.RoomTypeSessionBeanRemote;
 import entity.Guest;
 import entity.Reservation;
@@ -125,7 +122,7 @@ public class MainApp {
         try {
             Long guestId = guestSessionBeanRemote.createNewGuest(newGuest);
             System.out.println("Guest ID " + guestId + " created successfully!");
-            System.out.println("Please Login!");
+            System.out.println("Please Login!\n");
         } catch (GuestEmailExistException ex) {
             System.out.println("Email already exist");
         } catch (UnknownPersistenceException ex) {
@@ -138,7 +135,7 @@ public class MainApp {
         Integer response = 0;
 
         while (true) {
-            System.out.println("*** HoRS Management System ***\n");
+            System.out.println("*** HoRS Reservation System ***\n");
             System.out.println("You are login as " + loggedInGuest.getEmail() + "\n");
             System.out.println("1: Search Hotel Room");
             System.out.println("2: View My Reservation Details");
@@ -155,8 +152,20 @@ public class MainApp {
                     doSearchHotelRoom();
                 } else if (response == 2) {
                     doViewMyReservationDetails();
+                    System.out.println("*** HoRS Reservation System ***\n");
+                    System.out.println("You are login as " + loggedInGuest.getEmail() + "\n");
+                    System.out.println("1: Search Hotel Room");
+                    System.out.println("2: View My Reservation Details");
+                    System.out.println("3: View All My Reservation Details");
+                    System.out.println("4: Logout\n");
                 } else if (response == 3) {
                     doViewAllMyReservationDetails();
+                    System.out.println("*** HoRS Reservation System ***\n");
+                    System.out.println("You are login as " + loggedInGuest.getEmail() + "\n");
+                    System.out.println("1: Search Hotel Room");
+                    System.out.println("2: View My Reservation Details");
+                    System.out.println("3: View All My Reservation Details");
+                    System.out.println("4: Logout\n");
                 } else if (response == 4) {
                     break;
                 } else {
@@ -176,7 +185,7 @@ public class MainApp {
             Scanner scanner = new Scanner(System.in);
             String response = "";
 
-            System.out.println("*** Walk-in Search Room ***\n");
+            System.out.println("*** Search Hotel Room ***\n");
             System.out.print("Enter Check-in Date> ");
             String checkinDateStr = scanner.nextLine().trim();
             System.out.print("Enter Check-out Date> ");
@@ -233,8 +242,9 @@ public class MainApp {
 
             System.out.println("Reservation successful: You have reserved " + numOfRooms + " rooms for " + roomType + ". Here are your Reservation IDs: ");
             for (Long reservationId : reservationIds) {
-                System.out.println("Reservation ID " + reservationId);
+                System.out.println("Reservation ID : " + reservationId);
             }
+            System.out.println("");
         } catch (ReserveRoomException ex) {
             System.out.println(ex.getMessage());
         }
@@ -242,6 +252,9 @@ public class MainApp {
     }
 
     private void doViewMyReservationDetails() {
+
+        System.out.println("*** View My Reservation Details ***\n");
+
         Scanner scanner = new Scanner(System.in);
 
         System.out.print("Enter Reservation ID> "); //Only from search results
@@ -250,10 +263,11 @@ public class MainApp {
         try {
             Reservation reservation = guestSessionBeanRemote.viewGuestReservation(reservationId, loggedInGuest);
 
-            System.out.printf("%20s%20s%30s%30s%30s\n", "Reservation ID", "startDate", "endDate", "totalCost", "roomType");
-            System.out.printf("%20s%20s%30s%30s%30s\n", reservation.getReservationId(), reservation.getStartDate(), reservation.getEndDate(), reservation.getTotalCost(), reservation.getRoomType().getName());
+            System.out.println("------------------------------------------------------------------------------------------------");
+            System.out.printf("%30s%30s%40s%40s%40s\n", "Reservation ID", "startDate", "endDate", "totalCost", "roomType");
+            System.out.printf("%30s%30s%40s%40s%40s\n", reservation.getReservationId(), reservation.getStartDate(), reservation.getEndDate(), reservation.getTotalCost(), reservation.getRoomType().getName());
 
-            System.out.println("------------------------");
+            System.out.println("------------------------------------------------------------------------------------------------");
             System.out.println("1: back");
             System.out.print("> ");
             Integer response = scanner.nextInt();
@@ -266,18 +280,21 @@ public class MainApp {
 
     private void doViewAllMyReservationDetails() {
 
+        System.out.println("*** View All My Reservation Details ***\n");
+
         Scanner scanner = new Scanner(System.in);
-        
-        System.out.printf("%20s%20s%30s%30s%30s\n", "Reservation ID", "startDate", "endDate", "totalCost", "roomType");
+
+        System.out.printf("%30s%30s40s%40s%40s\n", "Reservation ID", "startDate", "endDate", "totalCost", "roomType");
 
         List<Reservation> reservations = guestSessionBeanRemote.viewGuestReservations(loggedInGuest);
 
+        System.out.println("------------------------------------------------------------------------------------------------");
         for (Reservation reservation : reservations) {
 
-            System.out.printf("%20s%20s%30s%30s%30s\n", reservation.getReservationId(), reservation.getStartDate(), reservation.getEndDate(), reservation.getTotalCost(), reservation.getRoomType().getName());
+            System.out.printf("%30s%30s%40s%40s%40s\n", reservation.getReservationId(), reservation.getStartDate(), reservation.getEndDate(), reservation.getTotalCost(), reservation.getRoomType().getName());
 
         }
-        System.out.println("------------------------");
+        System.out.println("------------------------------------------------------------------------------------------------");
         System.out.println("1: back");
         System.out.print("> ");
         Integer response = scanner.nextInt();
