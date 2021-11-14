@@ -5,7 +5,6 @@
  */
 package ejb.session.ws;
 
-import ejb.session.stateful.BookingReservationSessionBean;
 import ejb.session.stateful.BookingReservationSessionBeanLocal;
 import ejb.session.stateless.HandleDateTimeSessionBeanLocal;
 import ejb.session.stateless.PartnerSessionBeanLocal;
@@ -46,15 +45,13 @@ public class PartnerWebService {
 
     @EJB
     private BookingReservationSessionBeanLocal bookingReservationSessionBeanLocal;
+    
     @PersistenceContext(unitName = "PP03-ejbPU")
     private EntityManager em;
 
     @EJB(name = "PartnerSessionBeanLocal")
     private PartnerSessionBeanLocal partnerSessionBeanLocal;
 
-    /**
-     * This is a sample web service operation
-     */
     @WebMethod(operationName = "partnerLogin")
     public Partner partnerLogin(@WebParam(name = "username") String username,
             @WebParam(name = "password") String password)
@@ -95,18 +92,12 @@ public class PartnerWebService {
         List<Reservation> reservations = partnerSessionBeanLocal.viewReservations(partner);
 
         for (Reservation reservation : reservations) {
-            //If no need room type
-            //reservation.setRoomType(null);
+
             em.detach(reservation);
             reservation.setRoomType(null);
             
             reservation.setPartner(null);
-            //reservation.setRoomType(null);
-            
-            //If need room type
-//            RoomType roomType = reservation.getRoomType();
-//            em.detach(roomType);
-//            roomType.getReservations().remove(reservation);
+
         }
 
         return reservations;
@@ -151,21 +142,6 @@ public class PartnerWebService {
         return bookingReservationSessionBeanLocal.getOnlinePriceForRoomType(roomType, checkinDate, checkoutDate);
     }
     
-//    @WebMethod(operationName = "partnerReserveRoom")
-//    public List<Long> partnerReserveRoom(@WebParam(name = "roomTypeName") String roomTypeName, 
-//                                        @WebParam(name = "availableRooms") Integer availableRooms,
-//                                        @WebParam(name = "numOfRoomsToReserve") Integer numOfRoomsToReserve,
-//                                        @WebParam(name = "price") Double price,
-//                                        @WebParam(name = "checkinDate") Date checkinDate,
-//                                        @WebParam(name = "checkoutDate") Date checkoutDate,
-//                                        @WebParam(name = "partner") Guest partner)
-//                                        throws ReserveRoomException
-//    {
-//        bookingReservationSessionBeanLocal.saveSearchResults(roomTypeName, availableRooms);
-//        bookingReservationSessionBeanLocal.savePrices(roomTypeName, price);
-//        return bookingReservationSessionBeanLocal.onlineReserveRoom(roomTypeName, numOfRoomsToReserve, checkinDate, checkoutDate, partner);
-//    }
-    
     @WebMethod(operationName = "partnerReserveRoom")
     public List<Long> partnerReserveRoom(@WebParam(name = "availableInteger") Integer availableRooms,
                                         @WebParam(name = "price") BigDecimal price,
@@ -186,50 +162,5 @@ public class PartnerWebService {
         return bookingReservationSessionBeanLocal.onlineReserveRoomPartner(roomTypeName, numOfRoomsToReserve, checkinDate, checkoutDate, partner);
     }
     
-    
-    
-
-    /**
-     * @WebMethod(operationName = "getNumOfRoomsWithRoomType") public
-     * HashMap<String,Integer> getNumOfRoomsWithRoomType(@WebParam(name =
-     * "roomTypes") List<RoomType> roomTypes,
-     * @WebParam(name = "checkinDate") Date checkinDate,
-     * @WebParam(name = "checkoutDate") Date checkoutDate,
-     * @WebParam(name = "numRooms") Integer numRooms) throws
-     * RoomTypeNotFoundException { for(RoomType roomType:roomTypes) { Integer
-     * availableRooms =
-     * bookingReservationSessionBeanLocal.getNumOfAvailableRoomsForRoomType(roomType.getRoomTypeId(),
-     * checkinDate, checkoutDate);
-     *
-     * if (availableRooms >= numRooms) {
-     * bookingReservationSessionBeanLocal.saveSearchResults(roomType.getName(),
-     * availableRooms); }
-     *
-     * }
-     *
-     * return bookingReservationSessionBeanLocal.getSearchRoomResults(); }
-     *
-     * @WebMethod(operationName = "getNumOfRoomsWithRoomType") public
-     * HashMap<String,BigDecimal> getPriceWithRoomType(@WebParam(name =
-     * "roomTypes") List<RoomType> roomTypes,
-     * @WebParam(name = "checkinDate") Date checkinDate,
-     * @WebParam(name = "checkoutDate") Date checkoutDate,
-     * @WebParam(name = "numRooms") Integer numRooms) throws
-     * RoomTypeNotFoundException, CannotGetOnlinePriceException { for(RoomType
-     * roomType:roomTypes) { Integer availableRooms =
-     * bookingReservationSessionBeanLocal.getNumOfAvailableRoomsForRoomType(roomType.getRoomTypeId(),
-     * checkinDate, checkoutDate); if (availableRooms >= numRooms) {
-     *
-     * bookingReservationSessionBeanLocal.getOnlinePriceForRoomType(roomType,
-     * checkinDate, checkoutDate);
-     *
-     * }
-     * }
-     *
-     * return bookingReservationSessionBeanLocal.getRoomTypeNameAndTotalPrice();
-     * }
-     *
-     * public void persist(Object object) { em.persist(object); }
-     *
-     */
+   
 }

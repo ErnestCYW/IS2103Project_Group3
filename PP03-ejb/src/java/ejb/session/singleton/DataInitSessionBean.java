@@ -65,10 +65,6 @@ public class DataInitSessionBean {
     @EJB
     private RoomRateSessionBeanLocal roomRateSessionBean;
     
-    
-    
-    
-
     @PostConstruct
     public void postConstruct() {
         try {

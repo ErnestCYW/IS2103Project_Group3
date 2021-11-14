@@ -47,6 +47,7 @@ public class AllocationSessionBean implements AllocationSessionBeanRemote, Alloc
         @Schedule(dayOfWeek = "*"),
         @Schedule(hour = "2")
     })
+    @Override
     public void allocateRoomToCurrentDayReservations() throws CannotGetTodayDateException, RoomAllocationReportNotFoundException {
 
         RoomAllocationReport roomAllocationReport = roomAllocationReportSessionBean.createRoomAllocationReport();
